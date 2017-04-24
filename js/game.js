@@ -1,6 +1,7 @@
 App.Game = Ember.Object.extend({
 	
 	name: "new game",
+	version: "1.0.1",
 	player1 : null,
 	player2: null,
 	player1_strategy: null,
@@ -69,6 +70,8 @@ App.Game = Ember.Object.extend({
 			
 			this.drawCards(this.get('player1'), 4);
 			this.drawCards(this.get('player2'), 4);
+			
+			//this.drawCard(this.get('player2'), 'lighthouse');
 			
 			this.set('currentCharacter', null);
 			
@@ -189,13 +192,16 @@ App.Game = Ember.Object.extend({
 		for (var j=0; j<count; j++)
 			this.drawCard(player);
 	},
-	drawCard : function(player) {
+	drawCard : function(player, name) {
 		var n, draw = false, card,
 			deck_content = this.get('deck').get('content'),
 			deck_length = deck_content.length;
 		while (!draw) {
+			if (name) card = deck_content.findBy('name', name);
+			else {
 			n = Math.floor(Math.random() * deck_length);
 			card = deck_content.objectAt(n);
+			}
 			if (card.get('status') == 'in_deck')
 				{	
 					card.set('status', 'in_hand');

@@ -125,6 +125,31 @@ p {
 	width: 90px;
 	height: 28px;
 	font-size: 14px;
+}
+
+.start-footer-block {
+	width: 100%;
+	margin: 5px;
+	display: -webkit-box;
+	display: -ms-flexbox;
+	display: flex;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+    -ms-flex-direction: row;
+	flex-direction: row;
+    -webkit-box-pack: justify;
+	-ms-flex-pack: justify;
+    justify-content: space-between;
+    font-size: 12px;
+	
+}
+
+.game-version {
+	margin-left: 5px;
+}
+
+.game-rules {
+	margin-right: 5px;
 }	
 
 .phaze-block, .districts-block {
@@ -465,7 +490,7 @@ img[data-ember-action]:hover, .current {
 }
 
 .notes-head {
-	margin-top: 30px;
+	margin-top: 0;
 }
 
 .gamenotes-block {

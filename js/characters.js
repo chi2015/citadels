@@ -609,6 +609,8 @@ App.Wizard = App.Character.extend({
 		this.get('handle_player').set('coins', this.get('handle_player').get('coins')-build_cost); 
 		this.set('wizard_built', true);
 		this.get('handle_player').get('cards').removeObject(card);
+		
+		game.checkFirstClosed(this.get('handle_player'));
 	},
 	resetParams : function() {
 		this._super();
