@@ -6,7 +6,7 @@ html, body {
 	background-color: #BBBBBB;
 }
 
-h1, h2 {
+h1, h2, h3 {
 	margin: 0;
 }
 
@@ -85,7 +85,7 @@ p {
 
 .start-button-block button {
 	width: 90px;
-	height: 23px;
+	height: 28px;
 	font-size: 14px;
 }	
 
@@ -132,7 +132,6 @@ p {
 	justify-content: flex-start;
 	align-items: stretch;
 	height: 215px;
-	min-width: 967px;
 	border: solid black 2px;
 }
 
@@ -145,7 +144,7 @@ p {
 }
 
 .profile {
-	width: 200px;
+	width: 173px;
 	display: flex;
 	flex-direction: column;
 	justify-content: space-between;
@@ -200,8 +199,8 @@ p {
 .districts {
 	display: flex;
 	flex-direction: column;
-	justify-content: space-between;
 	align-items: flex-start;
+	min-width:801px;
 }
 
 .actions-block {
@@ -235,6 +234,13 @@ p {
 
 .score {
 	margin: 0 0 2px 5px;
+}
+
+.score-block {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+	width:100%;
 }
 
 .magic-buttons {
@@ -313,5 +319,17 @@ img[data-ember-action]:hover {
 .tooltip:hover .tooltiptext {
     visibility: visible;
     
+}
+
+.notes-head {
+	margin-top: 30px;
+}
+
+.gamenotes-block {
+	font-weight: normal;
+	font-style: italic;
+	padding: 10px 5px;
+	width: 500px;
+	background-color: #CCCCCC;
 }
 

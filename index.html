@@ -97,6 +97,7 @@
 		<div class="head-block">
 			<div class="title-block">
 			<h1>Game: {{model.name}}</h1>
+			<h3>(to {{model.player1.districts_to_close}} districts)</h3>
 			{{#unless model.phazeIsEnd }}
 			<h2>Phaze: {{model.phaze}}. 
 				{{#if model.phazeIsAction }}
@@ -482,7 +483,20 @@
 						</div>
 					{{/each}}
 				</div>
-				<div class="score">Score: {{model.player1.score}}</div>
+				<div class="score-block">
+					<div class="score">Score: {{model.player1.score}}</div>
+					{{#if model.player1.hasAllColours}}
+						<div style="margin: 0 5px 2px 0;">
+							<span style="color:#ff0000">C</span>
+							<span style="color:#ffcc00">O</span>
+							<span style="color:#ff0000">L</span>
+							<span style="color:#0000ff">O</span>
+							<span style="color:#9900ff">R</span>
+						</div>
+					{{/if}}
+					{{#if model.player1.hasMuseum}}{{#if model.player1.cards_under_museum}}<div style="margin: 0 5px 2px 0;">Cards under museum: {{model.player1.cards_under_museum}}</div>{{/if}}{{/if}}
+					{{#if model.player1.closed}}<div style="margin: 0 5px 2px 0;"><span style="color:white;">Closed</span></div>{{/if}}
+				</div>
 			</div>
 		</div>
 		<div class="board board-2">
@@ -542,7 +556,20 @@
 						</div>
 					{{/each}}
 				</div>
-				<div class="score">Score: {{model.player2.score}}</div>
+				<div class="score-block">
+					<div class="score">Score: {{model.player2.score}}</div>
+					{{#if model.player2.hasAllColours}}
+						<div style="margin: 0 5px 2px 0;">
+							<span style="color:#ff0000">C</span>
+							<span style="color:#ffcc00">O</span>
+							<span style="color:#009933">L</span>
+							<span style="color:#0000ff">O</span>
+							<span style="color:#9900ff">R</span>
+						</div>
+					{{/if}}
+					{{#if model.player2.hasMuseum}}{{#if model.player2.cards_under_museum}}<div style="margin: 0 5px 2px 0;">Cards under museum: {{model.player2.cards_under_museum}}</div>{{/if}}{{/if}}
+					{{#if model.player2.closed}}<div style="margin: 0 5px 2px 0;"><span style="color:white;">Closed</span></div>{{/if}}
+				</div>
 			</div>
 		</div>
 		<div class="districts-block">
@@ -851,6 +878,14 @@
 					{{/if}}
 			{{/if}}
 		{{/if}}
+		<p class="notes-head">Game notes</p>
+		<div class="gamenotes-block">
+			{{#each model.characters.content as |character|}}
+				{{#if character.isAssasinated}}{{character.name}} is assasinated<br/>{{/if}}
+				{{#if character.isBewitched}}{{character.name}} is bewitched<br/>{{/if}}
+				{{#if character.isRobbed}}{{character.name}} is robbed<br/>{{/if}}
+			{{/each}}
+		</div>
 		{{/unless}}
 	</div>
   </script>
@@ -859,5 +894,10 @@
   <script src="js/libs/ember-template-compiler-2.0.1.js"></script>
   <script src="js/libs/ember-2.0.1.debug.js"></script>
   <script src="js/app.js"></script>
+  <script src="js/deck.js"></script>
+  <script src="js/characters.js"></script>
+  <script src="js/player.js"></script>
+  <script src="js/game.js"></script>
+  <script src="js/index.js"></script>
 </body>
 </html>
