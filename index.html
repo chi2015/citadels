@@ -9,9 +9,13 @@
 <body>  
   <script type="text/x-handlebars" data-template-name="index">
 	<div class="main-block">
+		{{#if model.is_loading}}
+		Loading...
+		{{else}}
 		{{#if model.phazeIsStart}}
 			<form {{action 'start' gameName yourName robotName on="submit"}}>
 			<div class="start-block">
+			    <div class="sprite crown start-crown"></div>
 				<div class="start-subblock">
 					<div class="start-head-block">
 						<h2>2 players: You vs Robot</h2>
@@ -135,7 +139,7 @@
 						{{#each model.characters.content as |character|}}
 							{{#if character.inRound}}
 									<div class="tooltip">
-										<img {{action "takeCharacter" model model.activePlayer character}} src="characters/{{character.pic}}"/>
+										<div {{action "takeCharacter" model model.activePlayer character}} class="sprite {{character.class}} card-item"></div>
 										<span class="tooltiptext">{{character.desc}}</span>
 									</div>
 							{{/if}}
@@ -149,7 +153,7 @@
 					<div class="cards-list">
 						{{#each model.characters.content as |character|}}
 							{{#if character.inRound}}
-									<img {{action "discardCharacter" model model.activePlayer character}} src="characters/{{character.pic}}"/>
+							        <div {{action "discardCharacter" model model.activePlayer character}} class="sprite {{character.class}} card-item"></div>
 							{{/if}}
 						{{/each}}
 					</div>
@@ -163,7 +167,7 @@
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
 						{{#unless character.isAssassin}}
-							<img {{action "assassinateCharacter" model.currentCharacter character}} src="characters/{{character.pic}}"/>
+							<div {{action "assassinateCharacter" model.currentCharacter character}} class="sprite {{character.class}} card-item"></div>
 						{{/unless}}
 					{{/each}}
 					</div>
@@ -175,7 +179,7 @@
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
 						{{#unless character.isWitch}}
-							<img {{action "bewitchCharacter" model.currentCharacter character}} src="characters/{{character.pic}}"/>
+							<div {{action "bewitchCharacter" model.currentCharacter character}} class="sprite {{character.class}} card-item"></div>
 						{{/unless}}
 					{{/each}}
 					</div>
@@ -191,7 +195,7 @@
 						{{#unless character.isThief}}
 						{{#unless character.isAssassinated}}
 						{{#unless character.isBewitched}}
-							<img {{action "robCharacter" model.currentCharacter character}} src="characters/{{character.pic}}"/>
+						    <div {{action "robCharacter" model.currentCharacter character}} class="sprite {{character.class}} card-item"></div>
 						{{/unless}}
 						{{/unless}}
 						{{/unless}}
@@ -208,7 +212,7 @@
 						<div class="cards-list">
 							{{#each model.player2.cards as |card|}}
 								<div class="tooltip">
-									<img {{action "stealCard" model.currentCharacter model.player2 card}} src="districts/{{card.pic}}"/>
+									<div {{action "stealCard" model.currentCharacter model.player2 card}} class="sprite {{card.name}} card-item"></div>
 									<span class="tooltiptext">{{card.desc}}</span>
 								</div>
 							{{/each}}
@@ -227,7 +231,7 @@
 					<p>Choose enemy district to explode</p>
 					<div class="cards-list">
 							{{#each model.player2.districts as |district|}}
-								<img {{action "explode" model model.player1 district}} src="districts/{{district.pic}}"/>
+								<div {{action "explode" model model.player1 district}} class="sprite {{district.name}} card-item"></div>
 							{{/each}}
 					</div>
 				{{/if}}
@@ -237,7 +241,7 @@
 						{{#each model.deck.content as |card|}}
 							{{#if card.inDeck}}
 								<div class="tooltip">
-									<img {{action "lighthouseTake" model.player1 card}} src="districts/{{card.pic}}"/>
+									<div {{action "lighthouseTake" model.player1 card}} class="sprite {{card.name}} card-item"></div>
 									<span class="tooltiptext">{{card.desc}}</span>
 								</div>
 							{{/if}}
@@ -347,7 +351,7 @@
 						{{#each model.deck.content as |card|}}
 							{{#if card.onChoose }}
 								<div class="tooltip">
-									<img {{action "takeCard" model model.currentCharacter card}} src="districts/{{card.pic}}"/>
+									<div {{action "takeCard" model model.currentCharacter card}} class="sprite {{card.name}} card-item"></div>
 									<span class="tooltiptext">{{card.desc}}</span>
 								</div>
 							{{/if}}
@@ -361,7 +365,7 @@
 				{{#if model.player1.coins}}
 					<p>Do you want to pay 1 coin for taking this card?</p>
 					<div class="tooltip">
-						<img src="districts/{{model.deck.card_on_graveyard.pic}}"/>
+						<div class="sprite {{model.deck.card_on_graveyard.name}} card-item"></div>
 						<span class="tooltiptext">{{model.deck.card_on_graveyard.desc}}</span>
 					</div>
 					<button {{action 'yesGraveyard' model model.player1}}>Yes</button>
@@ -418,10 +422,10 @@
 						{{/unless}}
 						{{#if card.onWizard}}
 							<div class="character-notes">wizard</div>
-							<img {{action 'wizardBuild' model model.currentCharacter card}} src="districts/{{card.pic}}"/>
+							<div {{action 'wizardBuild' model model.currentCharacter card}} class="sprite {{card.name}} card-item"></div>
 						{{/if}}
 						{{#unless card.onWizard}} 
-							<img {{action 'build' model model.currentCharacter card}} src="districts/{{card.pic}}"/>
+							<div {{action 'build' model model.currentCharacter card}} class="sprite {{card.name}} card-item"></div>
 						{{/unless}}
 							<span class="tooltiptext">{{card.desc}}</span>
 					</div>
@@ -439,7 +443,7 @@
 				<div class="profile-head">
 					<div class="profile-name">{{model.player1.name}}</div>
 					<div class="profile-crown">
-						{{#if model.player1.has_crown}}<img src="crown.png"/>{{/if}}
+						{{#if model.player1.has_crown}}<div class="sprite crown"></div>{{/if}}
 					</div>
 				</div>
 				<div class="characters-list">
@@ -459,15 +463,15 @@
 											{{/if}}
 										</div>
 										{{#if character.is_current}}
-											<img src="characters/{{character.pic}}" class="current"/>
+											<div class="sprite {{character.class}} card-item current"></div>
 										{{/if}}
 										{{#unless character.is_current}}
-											<img src="characters/{{character.pic}}"/>
+											<div class="sprite {{character.class}} card-item"></div>
 										{{/unless}}
 										<span class="tooltiptext">{{character.desc}}</span>
 									{{else}}
 										<div class="character-notes"></div>
-										<img src="faceup.jpg"/>
+										<div class="sprite faceup"></div>
 									{{/if}}
 								{{else}}
 									<div class="character-notes">
@@ -482,10 +486,10 @@
 										{{/if}}
 									</div>
 									{{#if character.is_current}}
-										<img src="characters/{{character.pic}}" class="current"/>
+										<div class="sprite {{character.class}} card-item current"></div>
 									{{/if}}
 									{{#unless character.is_current}}
-										<img src="characters/{{character.pic}}"/>
+										<div class="sprite {{character.class}} card-item"></div>
 									{{/unless}}
 									<span class="tooltiptext">{{character.desc}}</span>
 								{{/if}}
@@ -494,11 +498,11 @@
 				</div>
 				<div class="resources">
 					<div class="rs-block">
-						<div class="resource-pic"><img src="gold.png"/></div>
+						<div class="resource-pic"><div class="sprite gold"></div></div>
 						<div class="resource-count">{{model.player1.coins}}</div>
 					</div>
 					<div class="rs-block">
-						<div class="resource-pic"><img src="card.png"/></div>
+						<div class="resource-pic"><div class="sprite card"></div></div>
 						<div class="resource-count">{{model.player1.cards.length}}</div>
 					</div>
 				</div>
@@ -508,14 +512,14 @@
 					{{#each model.player1.districts as |district|}}
 						<div class="tooltip">
 						{{#if model.currentCharacter.isWarlord}}
-							<img {{action "destroy" model model.currentCharacter model.player1 district}} src="districts/{{district.pic}}"/>
+							<div {{action "destroy" model model.currentCharacter model.player1 district}} class="sprite {{district.name}} card-item"></div>
 						{{/if}}
 						{{#if model.currentCharacter.isDiplomat}}
-							<img {{action "swap" model model.currentCharacter district}} src="districts/{{district.pic}}"/>
+							<div {{action "swap" model model.currentCharacter district}} class="sprite {{district.name}} card-item"></div>
 						{{/if}}
 						{{#unless model.currentCharacter.isWarlord}}
 							{{#unless model.currentCharacter.isDiplomat}}
-								<img src="districts/{{district.pic}}"/>
+								<div class="sprite {{district.name}} card-item"></div>
 							{{/unless}}
 						{{/unless}}
 							<span class="tooltiptext">{{district.desc}}</span>
@@ -549,7 +553,7 @@
 				<div class="profile-head">
 					<div class="profile-name">{{model.player2.name}}</div>
 					<div class="profile-crown">
-						{{#if model.player2.has_crown}}<img src="crown.png"/>{{/if}}
+						{{#if model.player2.has_crown}}<div class="sprite crown"></div>{{/if}}
 					</div>
 				</div>
 				<div class="characters-list">
@@ -569,15 +573,15 @@
 											{{/if}}
 										</div>
 										{{#if character.is_current}}
-											<img src="characters/{{character.pic}}" class="current"/>
+											<div class="sprite {{character.class}} card-item current"></div>
 										{{/if}}
 										{{#unless character.is_current}}
-											<img src="characters/{{character.pic}}"/>
+											<div class="sprite {{character.class}} card-item"></div>
 										{{/unless}}
 										<span class="tooltiptext">{{character.desc}}</span>
 									{{else}}
 										<div class="character-notes"></div>
-										<img src="faceup.jpg"/>
+										<div class="sprite faceup card-item"></div>
 									{{/if}}
 								{{else}}
 									<div class="character-notes">
@@ -592,10 +596,10 @@
 										{{/if}}
 									</div>
 									{{#if character.is_current}}
-										<img src="characters/{{character.pic}}" class="current"/>
+										<div class="sprite {{character.class}} card-item current"></div>
 									{{/if}}
 									{{#unless character.is_current}}
-										<img src="characters/{{character.pic}}"/>
+										<div class="sprite {{character.class}} card-item"></div>
 									{{/unless}}
 									<span class="tooltiptext">{{character.desc}}</span>
 								{{/if}}	
@@ -604,11 +608,11 @@
 				</div>
 				<div class="resources">
 					<div class="rs-block">
-						<div class="resource-pic"><img src="gold.png"/></div>
+						<div class="resource-pic"><div class="sprite gold"></div></div>
 						<div class="resource-count">{{model.player2.coins}}</div>
 					</div>
 					<div class="rs-block">
-						<div class="resource-pic"><img src="card.png"/></div>
+						<div class="resource-pic"><div class="sprite card"></div></div>
 						<div class="resource-count">{{model.player2.cards.length}}</div>
 					</div>
 				</div>
@@ -618,14 +622,14 @@
 					{{#each model.player2.districts as |district|}}
 						<div class="tooltip">
 						{{#if model.currentCharacter.isWarlord}}
-							<img {{action "destroy" model model.currentCharacter model.player2 district}} src="districts/{{district.pic}}"/>
+							<div {{action "destroy" model model.currentCharacter model.player2 district}} class="sprite {{district.name}} card-item"></div>
 						{{/if}}
 						{{#if model.currentCharacter.isDiplomat}}
-							<img {{action "swap" model model.currentCharacter district}} src="districts/{{district.pic}}"/>
+							<div {{action "swap" model model.currentCharacter district}} class="sprite {{district.name}} card-item"></div>
 						{{/if}}
 						{{#unless model.currentCharacter.isWarlord}}
 							{{#unless model.currentCharacter.isDiplomat}}
-								<img src="districts/{{district.pic}}"/>
+								<div  class="sprite {{district.name}} card-item"></div>
 							{{/unless}}
 						{{/unless}}
 							<span class="tooltiptext">{{district.desc}}</span>
@@ -661,7 +665,7 @@
 					{{#if model.player2.coins}}
 						<p>Do you want to pay 1 coin for taking this card?</p>
 						<div class="tooltip">
-							<img src="districts/{{model.deck.card_on_graveyard.pic}}"/>
+							<div class="sprite {{model.deck.card_on_graveyard.name}} card-item"></div>
 							<span class="tooltiptext">{{model.deck.card_on_graveyard.desc}}</span>
 						</div>
 						<button {{action 'yesGraveyard' model model.player2}}>Yes</button>
@@ -717,10 +721,10 @@
 						{{/unless}} 
 						{{#if card.onWizard}}
 							<div class="character-notes">wizard</div>
-							<img {{action 'wizardBuild' model model.currentCharacter card}} src="districts/{{card.pic}}"/>
+							<div {{action 'wizardBuild' model model.currentCharacter card}} class="sprite {{card.name}} card-item"></div>
 						{{/if}}
 						{{#unless card.onWizard}} 
-							<img {{action 'build' model model.currentCharacter card}} src="districts/{{card.pic}}"/>
+							<div {{action 'build' model model.currentCharacter card}} class="sprite {{card.name}} card-item"></div>
 						{{/unless}}
 						<span class="tooltiptext">{{card.desc}}</span>
 					</div>
@@ -740,7 +744,7 @@
 						{{#each model.characters.content as |character|}}
 							{{#if character.inRound}}
 									<div class="tooltip">
-										<img {{action "takeCharacter" model model.activePlayer character}} src="characters/{{character.pic}}"/>
+										<div {{action "takeCharacter" model model.activePlayer character}} class="sprite {{character.class}} card-item"></div>
 										<span class="tooltiptext">{{character.desc}}</span>
 									</div>
 							{{/if}}
@@ -754,7 +758,7 @@
 					<div class="cards-list">
 						{{#each model.characters.content as |character|}}
 							{{#if character.inRound}}
-									<img {{action "discardCharacter" model model.activePlayer character}} src="characters/{{character.pic}}"/>
+									<div {{action "discardCharacter" model model.activePlayer character}} class="sprite {{character.class}} card-item"></div>
 							{{/if}}
 						{{/each}}
 					</div>
@@ -768,7 +772,7 @@
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
 						{{#unless character.isAssassin}}
-							<img {{action "assassinateCharacter" model.currentCharacter character}} src="characters/{{character.pic}}"/>
+							<div {{action "assassinateCharacter" model.currentCharacter character}} class="sprite {{character.class}} card-item"></div>
 						{{/unless}}
 					{{/each}}
 					</div>
@@ -780,7 +784,7 @@
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
 						{{#unless character.isWitch}}
-							<img {{action "bewitchCharacter" model.currentCharacter character}} src="characters/{{character.pic}}"/>
+							<div {{action "bewitchCharacter" model.currentCharacter character}} class="sprite {{character.class}} card-item"></div>
 						{{/unless}}
 					{{/each}}
 					</div>
@@ -796,7 +800,7 @@
 						{{#unless character.isThief}}
 						{{#unless character.isAssassinated}}
 						{{#unless character.isBewitched}}
-							<img {{action "robCharacter" model.currentCharacter character}} src="characters/{{character.pic}}"/>
+							<div {{action "robCharacter" model.currentCharacter character}} class="sprite {{character.class}} card-item"></div>
 						{{/unless}}
 						{{/unless}}
 						{{/unless}}
@@ -813,7 +817,7 @@
 						<div class="cards-list">
 							{{#each model.player1.cards as |card|}}
 								<div class="tooltip">
-									<img {{action "stealCard" model.currentCharacter model.player1 card}} src="districts/{{card.pic}}"/>
+									<div {{action "stealCard" model.currentCharacter model.player1 card}} class="sprite {{card.name}} card-item"></div>
 									<span class="tooltiptext">{{card.desc}}</span>
 								</div>
 							{{/each}}
@@ -832,7 +836,7 @@
 					<p>Choose enemy district to explode</p>
 					<div class="cards-list">
 							{{#each model.player1.districts as |district|}}
-								<img {{action "explode" model model.player2 district}} src="districts/{{district.pic}}"/>
+								<div {{action "explode" model model.player2 district}} class="sprite {{district.name}} card-item"></div>
 							{{/each}}
 					</div>
 				{{/if}}
@@ -842,7 +846,7 @@
 						{{#each model.deck.content as |card|}}
 							{{#if card.inDeck}}
 								<div class="tooltip">
-									<img {{action "lighthouseTake" model.player2 card}} src="districts/{{card.pic}}"/>
+									<div {{action "lighthouseTake" model.player2 card}} class="sprite {{card.name}} card-item"></div>
 									<span class="tooltiptext">{{card.desc}}</span>
 								</div>
 							{{/if}}
@@ -952,7 +956,7 @@
 							{{#each model.deck.content as |card|}}
 								{{#if card.onChoose }}
 									<div class="tooltip">
-										<img {{action "takeCard" model model.currentCharacter card}} src="districts/{{card.pic}}"/>
+										<div {{action "takeCard" model model.currentCharacter card}} class="sprite {{card.name}} card-item"></div>
 										<span class="tooltiptext">{{card.desc}}</span>
 									</div>
 								{{/if}}
@@ -971,6 +975,7 @@
 			{{/each}}
 		</div>
 		{{/unless}}
+	{{/if}}
 	</div>
   </script>
 

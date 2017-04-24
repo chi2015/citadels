@@ -75,10 +75,7 @@ App.Strategy = Ember.Object.extend({
 			danger_characters = this.pushCharacter(danger_characters, characters.findBy('number', 1));
 		if (in_round && this.get('player').get('has_crown') && characters.findBy('name', 'Thief') && this.get('enemy').get('coins') > 2)
 			danger_characters = this.pushCharacter(danger_characters, characters.findBy('name', 'Thief'));
-		if ((!this.get('player').get('characters').findBy('name', 'Bishop') || !this.get('player').get('has_crown')) && !this.get('player').get('closed') &&
-			this.get('player').get('districts').length < this.get('enemy').get('districts').length + 2 && 
-			(this.get('enemy').get('districts').filterBy('color', 'red').length + this.get('enemy').hasDistrict('school') > 1 || this.get('enemy').get('coins') > 3)
-			&& characters.findBy('name', 'Warlord') && (in_round || (!in_round && this.isPossibleEnemyCharacter(8))))
+		if (characters.findBy('name', 'Warlord') && this.warlordIsDangerous() && (in_round || (!in_round && this.isPossibleEnemyCharacter(8))))
 			danger_characters = this.pushCharacter(danger_characters, characters.findBy('name', 'Warlord'));
 		if (in_round && this.get('player').get('has_crown') && 
 		        characters.findBy('name', 'Magician') && 
@@ -98,10 +95,6 @@ App.Strategy = Ember.Object.extend({
 			this.get('player').hasDistrict('treasury') || this.get('player').hasDistrict('museum')) && !this.get('player').get('closed') &&
 			characters.findBy('name', 'Diplomat') && (in_round || (!in_round && this.isPossibleEnemyCharacter(8))))
 			danger_characters = this.pushCharacter(danger_characters, characters.findBy('name', 'Diplomat'));
-		if ((!this.get('player').get('characters').findBy('name', 'Bishop') || !this.get('player').get('has_crown'))
-		        && this.get('player').get('districts').length < this.get('enemy').get('districts').length + 2
-		        && !this.get('player').get('closed') && characters.findBy('name', 'Warlord') && (in_round || (!in_round && this.isPossibleEnemyCharacter(8))))
-			danger_characters = this.pushCharacter(danger_characters, characters.findBy('name', 'Warlord'));
 		if (this.get('enemy').get('cards').length < 3 && 
 		    this.get('player').get('cards').length > 1 &&
 		    this.get('player').get('cards').length > this.get('enemy').get('cards').length
@@ -180,6 +173,14 @@ App.Strategy = Ember.Object.extend({
 		if (c > 1 || d) b--;
 		if (a > b) useful = true;
 		return useful;
+	},
+	warlordIsDangerous : function() {
+		if (this.get('player').get('has_crown') && this.get('player').get('characters').findBy('name', 'Bishop')) return false;
+		if (this.get('player').get('closed')) return false;
+		if (this.get('enemy').get('coins') + this.get('enemy').get('districts').filterBy('color','red').length + this.get('enemy').hasDistrict('school') <
+		this.get('player').get('score') - this.get('enemy').get('score')) return false;
+		if (this.get('player').get('districts').length >= this.get('enemy').get('districts').length + 2) return false;
+		return true;
 	},
 	usefulCharacter : function() {
 		var characters = this.get('game').get('characters').get('content').filterBy('status', 'in_round');
@@ -645,7 +646,8 @@ App.Strategy = Ember.Object.extend({
 		}
 		else {
 			this.get('player').get('cards').forEach(function(card) {
-				if (that.get('player').hasDistrict(card.get('name')) > that.get('player').hasDistrict('quarry')) {
+				if (that.get('player').hasDistrict(card.get('name')) > that.get('player').hasDistrict('quarry')
+				   || that.endOfGame() && card.get('cost') - (that.get('player').hasDistrict('factory') && card.get('color') == 'purple') > that.get('player').get('coins')) {
 					that.get('game').get('currentCharacter').chooseToDiscard();
 					card.set('isChecked', true);
 				}	

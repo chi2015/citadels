@@ -61,6 +61,13 @@ p {
 	        align-items: center;
 	background-image: url('../startpic.jpg');
 	background-size: 550px auto;
+	position: relative;
+}
+
+.start-crown {
+	position: absolute;
+	right: 10px;
+	top: 10px;
 }
 
 .start-head-block {
@@ -177,13 +184,8 @@ p {
 	height: 140px;
 }
 
-.cards-list {
-
-}
-
-.cards-list img, .characters-list img {
+.cards-list .card-item, .characters-list .card-item {
 	margin: 5px;
-	
 }
 
 .lighthouse-cards {
@@ -202,7 +204,7 @@ p {
 	width: 900px;
 }
 
-.lighthouse-cards img {
+.lighthouse-cards .card-item {
 	margin: 5px;
 }	
 
@@ -440,16 +442,16 @@ p {
 	margin-bottom: 10px;
 }
 
-img[data-ember-action] {
+div[data-ember-action] {
   cursor: pointer;
 }
 
-img[data-ember-action]:hover, .current {
+div[data-ember-action]:hover, .current {
 	/*box-shadow: 0 0 10px #668cff;*/
 	box-shadow: 0 0 20px #0039e6;
 }
 
-.discard-block img {
+.discard-block .card-item {
 	opacity: 0.5;
 }
 
@@ -506,3 +508,67 @@ img[data-ember-action]:hover, .current {
 	font-size: 12px;
 	padding: 0 10px;
 }
+
+.sprite { background: url('../sprite.png') no-repeat top left; width: 75px; height: 120px;  } 
+.sprite.armory { background-position: 0 0; } 
+.sprite.ballroom { background-position: -78px 0; } 
+.sprite.barracks { background-position: -156px 0; } 
+.sprite.belltower { background-position: -234px 0; } 
+.sprite.card { background-position: -312px 0; width: 33px; height: 33px; } 
+.sprite.castle { background-position: -348px 0; } 
+.sprite.cathedral { background-position: -426px 0; } 
+.sprite.character1 { background-position: -504px 0; } 
+.sprite.character2 { background-position: -582px 0; } 
+.sprite.character3 { background-position: -660px 0; } 
+.sprite.character4 { background-position: -738px 0; } 
+.sprite.character5 { background-position: -816px 0; } 
+.sprite.character6 { background-position: -894px 0; } 
+.sprite.character7 { background-position: -972px 0; } 
+.sprite.character8 { background-position: -1050px 0; } 
+.sprite.character11 { background-position: -1128px 0; } 
+.sprite.character12 { background-position: -1206px 0; } 
+.sprite.character13 { background-position: -1284px 0; } 
+.sprite.character14 { background-position: -1362px 0; } 
+.sprite.character15 { background-position: -1440px 0; } 
+.sprite.character16 { background-position: -1518px 0; } 
+.sprite.character17 { background-position: -1596px 0; } 
+.sprite.character18 { background-position: -1674px 0; } 
+.sprite.church { background-position: -1752px 0; } 
+.sprite.city { background-position: -1830px 0; } 
+.sprite.crown { background-position: -1908px 0; width: 33px; height: 33px; } 
+.sprite.domain { background-position: -1944px 0; } 
+.sprite.dragongate { background-position: -2022px 0; } 
+.sprite.faceup { background-position: -2100px 0; } 
+.sprite.factory { background-position: -2178px 0; } 
+.sprite.fortress { background-position: -2256px 0; } 
+.sprite.fountain { background-position: -2334px 0; } 
+.sprite.gold { background-position: -2412px 0; width: 33px; height: 33px; } 
+.sprite.graveyard { background-position: -2448px 0; } 
+.sprite.greatwall { background-position: -2526px 0; } 
+.sprite.harbour { background-position: -2604px 0; } 
+.sprite.hospital { background-position: -2682px 0; } 
+.sprite.keep { background-position: -2760px 0; } 
+.sprite.lab { background-position: -2838px 0; } 
+.sprite.library { background-position: -2916px 0; } 
+.sprite.lighthouse { background-position: -2994px 0; } 
+.sprite.maproom { background-position: -3072px 0; } 
+.sprite.market { background-position: -3150px 0; } 
+.sprite.monastery { background-position: -3228px 0; } 
+.sprite.museum { background-position: -3306px 0; } 
+.sprite.observatory { background-position: -3384px 0; } 
+.sprite.palace { background-position: -3462px 0; } 
+.sprite.park { background-position: -3540px 0; } 
+.sprite.poorhouse { background-position: -3618px 0; } 
+.sprite.prison { background-position: -3696px 0; } 
+.sprite.quarry { background-position: -3774px 0; } 
+.sprite.school { background-position: -3852px 0; } 
+.sprite.store { background-position: -3930px 0; } 
+.sprite.tavern { background-position: -4008px 0; } 
+.sprite.temple { background-position: -4086px 0; } 
+.sprite.throneroom { background-position: -4164px 0; width: 76px; } 
+.sprite.townhall { background-position: -4243px 0; } 
+.sprite.treasury { background-position: -4321px 0; } 
+.sprite.university { background-position: -4399px 0; } 
+.sprite.warehouse { background-position: -4477px 0; } 
+.sprite.watchtower { background-position: -4555px 0; } 
+.sprite.workshop { background-position: -4633px 0; } 

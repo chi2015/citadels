@@ -1,7 +1,7 @@
 App.Game = Ember.Object.extend({
 	
 	name: "new game",
-	version: "1.0.3",
+	version: "1.1.0",
 	player1 : null,
 	player2: null,
 	player1_strategy: null,
@@ -16,6 +16,7 @@ App.Game = Ember.Object.extend({
 	winner : "",
 	is_extended : false,
 	extended : [],
+	is_loading : true,
 	setWinner : function() {
 		var winner;
 		if (this.get('player1').get('score') > this.get('player2').get('score'))
@@ -121,6 +122,10 @@ App.Game = Ember.Object.extend({
 		var that = this;
 		$( window ).bind("unload", function() {
 			that.save();
+		});
+		
+		$( window ).load(function() {
+			that.set('is_loading', false);
 		});
 	},
 	save : function() {
