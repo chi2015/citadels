@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Citadelles Game</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>  
+  <script type="text/x-handlebars" data-template-name="index">
+	<div class="main-block">
+		<div class="head-block">
+			<h1>Game: {{model.name}}</h1>
+			{{#unless model.phazeIsEnd }}
+			<h2>Phaze: {{model.phaze}}. 
+				{{#if model.phazeIsAction }}
+					King summons {{model.currentCharacter.name}}.
+				{{/if}}
+			{{model.activePlayer.name}}'s turn</h2>
+			{{/unless}}
+			{{#if model.phazeIsEnd }}
+			<h2>Game finished! The winner is {{model.winner}}</h2>
+			{{/if}}
+		</div>
+		{{#if model.youActivePlayer}}
+			{{#if model.phazeIsChoose }}
+				<div class="phaze-block">
+					<p>Choose character:</p>
+					<div class="cards-list">
+						{{#each model.characters.content as |character|}}
+							{{#if character.inRound}}
+									<img {{action "takeCharacter" character}} src="characters/{{character.pic}}"/>
+							{{/if}}
+						{{/each}}
+					</div>
+				</div>
+			{{/if}}
+			{{#if model.phazeIsDiscard }}
+				<div class="phaze-block">
+					<p>Discard character:</p>
+					<div class="cards-list">
+						{{#each model.characters.content as |character|}}
+							{{#if character.inRound}}
+									<img {{action "discardCharacter" character}} src="characters/{{character.pic}}"/>
+							{{/if}}
+						{{/each}}
+					</div>
+				</div>
+			{{/if}}
+			{{#if model.phazeIsAction }}
+				{{#if model.currentCharacter.isAssasin}}
+					{{#unless model.currentCharacter.assasinated }}
+					<p>Choose character to assasinate</p>
+					<div class="cards-list">
+					{{#each model.characters.content as |character|}}
+						{{#unless character.isAssasin}}
+							<img {{action "assasinateCharacter" character}} src="characters/{{character.pic}}"/>
+						{{/unless}}
+					{{/each}}
+					</div>
+					{{/unless}}
+				{{/if}}
+				{{#if model.currentCharacter.isThief}}
+					{{#unless model.currentCharacter.robbed }}
+					<p>Choose character to rob</p>
+					<div class="cards-list">
+					{{#each model.characters.content as |character|}}
+						{{#unless character.isAssasin}}
+						{{#unless character.isThief}}
+						{{#unless character.isAssasinated}}
+							<img {{action "robCharacter" character}} src="characters/{{character.pic}}"/>
+						{{/unless}}
+						{{/unless}}
+						{{/unless}}
+					{{/each}}
+					</div>
+					{{/unless}}
+				{{/if}}
+				<div class="actions-block">
+					{{#unless model.currentCharacter.took}}
+						<button {{action 'takeCoins'}}>Take 2 coins</button>
+						<button {{action 'chooseCards'}}>Choose cards</button>
+					{{/unless}}
+					{{#if model.currentCharacter.isMagician}}
+						{{#unless model.currentCharacter.did_magic}}
+						<button {{action 'doMagic'}}>Do magic</button>
+						{{/unless}}
+					{{/if}}
+					{{#if model.currentCharacter.isColor}}
+						{{#unless model.currentCharacter.took_income}}
+						<button {{action 'takeIncome'}}>Take income</button> 
+						{{/unless}}
+					{{/if}}
+					{{#if model.currentCharacter.isWarlord}}
+						{{#unless model.currentCharacter.destroyed}}
+							<p>Click to enemy district to destroy</p>
+						{{/unless}}
+						{{/if}}
+					{{#if model.currentCharacter.took}}
+						{{#unless model.player1.cards_on_choose}}
+							{{#if model.currentCharacter.can_build}}
+								<p>Click to one of your cards to build</p>
+							{{/if}}
+							<button {{action 'endTurn'}}>End turn</button>
+						{{/unless}}
+					{{/if}}
+				</div>
+					{{#if model.player1.cards_on_choose }}
+					<p>Choose card to take:</p>
+					<div class="cards-list">
+						{{#each model.deck.content as |card index|}}
+							{{#if card.onChoose }}
+								<img {{action "takeCard" index}} src="districts/{{card.pic}}"/>
+							{{/if}}
+						{{/each}}
+					</div>
+					{{/if}}
+			{{/if}}
+		{{/if}}
+		<div class="districts-block">
+			<p>Your cards:</p>
+			<div class="cards-list">
+				{{#each model.deck.content as |card index|}}
+						{{#if card.inMyHand }}
+							<img {{action 'build' index}} src="districts/{{card.pic}}"/>
+						{{/if}}
+				{{/each}}
+			</div>
+		</div>
+		<div class="board board-1">
+			<div class="profile">
+				<div class="profile-head">
+					<div class="profile-name">{{model.player1.name}}</div>
+					<div class="profile-crown">
+						{{#if model.player1.has_crown}}<img src="crown.png"/>{{/if}}
+					</div>
+				</div>
+				<div class="cards-list">
+					{{#each model.characters.content as |character|}}
+						{{#if character.inMyHand }}
+							<div class="character-block">
+								<div class="character-notes">
+									{{#if character.isAssasinated }}
+										assasinated
+									{{/if}}
+									{{#if character.isRobbed }}
+										robbed
+									{{/if}}
+								</div>
+								<img src="characters/{{character.pic}}"/>
+							</div>
+						{{/if}}
+					{{/each}}
+				</div>
+				<div class="resources">
+					<div class="rs-block">
+						<div class="resource-pic"><img src="gold.png"/></div>
+						<div class="resource-count">{{model.player1.coins}}</div>
+					</div>
+					<div class="rs-block">
+						<div class="resource-pic"><img src="card.png"/></div>
+						<div class="resource-count">{{model.player1.cards_count}}</div>
+					</div>
+				</div>
+			</div>
+			<div class="districts">
+				<div class="cards-list">
+					{{#each model.player1.districts as |district|}}
+						<img {{action "destroy" district}} src="districts/{{district.pic}}"/>
+					{{/each}}
+				</div>
+				<div class="score">Score: {{model.player1.score}}</div>
+			</div>
+		</div>
+		<div class="board board-2">
+			<div class="profile">
+				<div class="profile-head">
+					<div class="profile-name">{{model.player2.name}}</div>
+					<div class="profile-crown">
+						{{#if model.player2.has_crown}}<img src="crown.png"/>{{/if}}
+					</div>
+				</div>
+				<div class="cards-list">
+					{{#each model.characters.content as |character|}}
+						{{#if character.inRobotHand }}
+							<div class="character-block">
+								<div class="character-notes">
+									{{#if character.isAssasinated }}
+										assasinated
+									{{/if}}
+									{{#if character.isRobbed }}
+										robbed
+									{{/if}}
+								</div>
+								<img src="characters/{{character.pic}}"/>
+							</div>
+						{{/if}}
+					{{/each}}
+				</div>
+				<div class="resources">
+					<div class="rs-block">
+						<div class="resource-pic"><img src="gold.png"/></div>
+						<div class="resource-count">{{model.player2.coins}}</div>
+					</div>
+					<div class="rs-block">
+						<div class="resource-pic"><img src="card.png"/></div>
+						<div class="resource-count">{{model.player2.cards_count}}</div>
+					</div>
+				</div>
+			</div>
+			<div class="districts">
+				<div class="cards-list">
+					{{#each model.player2.districts as |district|}}
+						<img {{action "destroy" district}} src="districts/{{district.pic}}"/>
+					{{/each}}
+				</div>
+				<div class="score">Score: {{model.player2.score}}</div>
+			</div>
+		</div>
+		<div class="districts-block">
+			<p>Robot cards:</p>
+			<div class="cards-list">
+				{{#each model.deck.content as |card index|}}
+						{{#if card.inRobotHand }}
+							<img {{action 'build' index}} src="districts/{{card.pic}}"/>
+						{{/if}}
+				{{/each}}
+			</div>
+		</div>
+		{{#if model.robotActivePlayer}}
+			{{#if model.phazeIsChoose }}
+				<div class="phaze-block">
+					<p>Choose character:</p>
+					<div class="cards-list">
+						{{#each model.characters.content as |character|}}
+							{{#if character.inRound}}
+									<img {{action "takeCharacter" character}} src="characters/{{character.pic}}"/>
+							{{/if}}
+						{{/each}}
+					</div>
+				</div>
+			{{/if}}
+			{{#if model.phazeIsDiscard }}
+				<div class="phaze-block">
+					<p>Discard character:</p>
+					<div class="cards-list">
+						{{#each model.characters.content as |character|}}
+							{{#if character.inRound}}
+									<img {{action "discardCharacter" character}} src="characters/{{character.pic}}"/>
+							{{/if}}
+						{{/each}}
+					</div>
+				</div>
+			{{/if}}
+			{{#if model.phazeIsAction }}
+				{{#if model.currentCharacter.isAssasin}}
+					{{#unless model.currentCharacter.assasinated }}
+					<p>Choose character to assasinate</p>
+					<div class="cards-list">
+					{{#each model.characters.content as |character|}}
+						{{#unless character.isAssasin}}
+							<img {{action "assasinateCharacter" character}} src="characters/{{character.pic}}"/>
+						{{/unless}}
+					{{/each}}
+					</div>
+					{{/unless}}
+				{{/if}}
+				{{#if model.currentCharacter.isThief}}
+					{{#unless model.currentCharacter.robbed }}
+					<p>Choose character to rob</p>
+					<div class="cards-list">
+					{{#each model.characters.content as |character|}}
+						{{#unless character.isAssasin}}
+						{{#unless character.isAssasinated}}
+						{{#unless character.isThief}}
+							<img {{action "robCharacter" character}} src="characters/{{character.pic}}"/>
+						{{/unless}}
+						{{/unless}}
+						{{/unless}}
+					{{/each}}
+					</div>
+					{{/unless}}
+				{{/if}}
+				<div class="actions-block">
+					{{#unless model.currentCharacter.took}}
+						<button {{action 'takeCoins'}}>Take 2 coins</button>
+						<button {{action 'chooseCards'}}>Choose cards</button>
+					{{/unless}}
+					{{#if model.currentCharacter.isMagician}}
+						{{#unless model.currentCharacter.did_magic}}
+								<button {{action 'doMagic'}}>Do magic</button>
+						{{/unless}}
+					{{/if}}
+					{{#if model.currentCharacter.isColor}}
+						{{#unless model.currentCharacter.took_income}}
+						<button {{action 'takeIncome'}}>Take income</button> 
+						{{/unless}}
+					{{/if}}
+					{{#if model.currentCharacter.isWarlord}}
+							{{#unless model.currentCharacter.destroyed}}
+								<p>Click to enemy district to destroy</p>
+							{{/unless}}
+					{{/if}}
+					{{#if model.currentCharacter.took}}
+						{{#unless model.player2.cards_on_choose}}
+							{{#if model.currentCharacter.can_build}}
+								<p>Click to one of your cards to build</p>
+							{{/if}}
+							<button {{action 'endTurn'}}>End turn</button>
+						{{/unless}}
+					{{/if}}
+				</div>
+				
+					{{#if model.player2.cards_on_choose }}
+						<p>Choose card to take:</p>
+						<div class="cards-list">
+							{{#each model.deck.content as |card index|}}
+								{{#if card.onChoose }}
+									<img {{action "takeCard" index}} src="districts/{{card.pic}}"/>
+								{{/if}}
+							{{/each}}
+						</div>
+					{{/if}}
+			{{/if}}
+		{{/if}}
+	</div>
+  </script>
+
+  <script src="js/libs/jquery-1.10.2.js"></script>
+  <script src="js/libs/ember-template-compiler-2.0.1.js"></script>
+  <script src="js/libs/ember-2.0.1.debug.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

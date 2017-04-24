@@ -1,0 +1,142 @@
+html, body {
+	font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+	font-size: 14px;
+	color: #333;
+	font-weight: bold;
+	background-color: #BBBBBB;
+}
+
+.main-block {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+	margin-left: 40px;
+}
+
+.phaze-block, .districts-block {
+	height: 180px;
+}
+
+.cards-list, .characters-list {
+	height: 155px;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+	margin: auto 0;
+}
+
+.cards-list {
+
+}
+
+.cards-list img {
+	margin: 5px;
+	
+}
+
+.board {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: stretch;
+	height: 230px;
+	width: 100%;
+	border: solid black 2px;
+}
+
+.board-1 {
+	margin-top: 40px;
+}
+
+.board-2 {
+	margin-bottom: 40px;
+}
+
+.profile {
+	width: 200px;
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: stretch;
+	border: solid black 1px;
+}
+
+.profile-head {
+	height: 40px;
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+}
+
+.profile-name {
+	margin: 1px;
+}
+
+.profile-crown img {
+	height: 35px;
+}
+
+.resources {
+	height: 40px;
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.rs-block {
+	margin: 10px;
+	display: flex;
+	display-flex: row;
+	justify-content: space-between;
+	align-items: center;
+	width: 50px;
+}
+
+.resource-pic {
+	margin: 2px;
+}
+
+.resource-pic img {
+	height: 35px;
+}
+
+.resource-count {
+	font-size: 22px;
+}
+
+.districts {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	align-items: flex-start;
+}
+
+.actions-block {
+	margin: 20px 0;
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: flex-start;
+}
+
+.character-block {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+}
+
+.character-notes {
+	font-size: 14px;
+	font-weight: normal;
+	color: red;
+	height: 15px;
+}
+
+.score {
+	margin-left: 5px;
+}
+
