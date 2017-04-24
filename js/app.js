@@ -4,7 +4,7 @@ App = Ember.Application.create();
 App.Card = Ember.Object.extend({
 	player : false,
 	isChecked : false,
-	status : 'in_deck', //in_deck, on_choice, in_hand, built, destroyed, in_lab, on_graveyard
+	status : 'in_deck', //in_deck, on_choice, in_hand, built, destroyed, in_lab, on_graveyard, on_wizard, on_swap, in_museum
 	onChoose : function() {
 		return this.get('status') == 'on_choice';
 	}.property('status'),
@@ -17,7 +17,13 @@ App.Card = Ember.Object.extend({
 			"status" : this.get('status'),
 			"player" : this.get('player') ? this.get('player').get('name') : false
 		};
-	}
+	},
+	onWizard : function() {
+		return this.get('status') == 'on_wizard';
+	}.property('status'),
+	inDeck : function() {
+		return this.get('status') == 'in_deck';
+	}.property('status')
 });
 
 App.Deck = Ember.Object.extend({
@@ -31,24 +37,43 @@ App.Deck = Ember.Object.extend({
 				});
 			this.set('init_deck', []);
 		} else {
-			
+				this.initDefaultDeck();
+				if (this.get('extended').length) this.initExtendedDeck();
+		}
+	},
+	extended : [],
+	inExtended : function(number) {
+		var extended = this.get('extended');
+		for (var j=0; j<extended.length; j++)
+			if (number == extended[j])
+				return true;
+		return false;
+	},
+	cards_on_choose : Ember.computed('content.@each.status', function() {
+		return this.get('content').filterBy('status','on_choice').length > 0;
+	}),
+	card_on_graveyard : Ember.computed('content.@each.status', function() {
+		return this.get('content').findBy('status','on_graveyard');
+	}),
+	initDefaultDeck : function() {
+		var deck_content = this.get('content');
 		for (i=0; i<5; i++) 
 			deck_content.pushObject(App.Card.create({"name":"domain","color":"yellow","pic":"domain.jpg","cost":3}));
-		for (i=0; i<5; i++) 
+		for (i=0; i<4; i++) 
 			deck_content.pushObject(App.Card.create({"name":"castle","color":"yellow","pic":"castle.jpg","cost":4}));
-		for (i=0; i<2; i++) 
+		for (i=0; i<3; i++) 
 			deck_content.pushObject(App.Card.create({"name":"palace","color":"yellow","pic":"palace.jpg","cost":5}));
 		for (i=0; i<3; i++) 
 			deck_content.pushObject(App.Card.create({"name":"temple","color":"blue","pic":"temple.jpg","cost":1}));
 		for (i=0; i<3; i++) 
 			deck_content.pushObject(App.Card.create({"name":"church","color":"blue","pic":"church.jpg","cost":2}));
-		for (i=0; i<4; i++) 
+		for (i=0; i<3; i++) 
 			deck_content.pushObject(App.Card.create({"name":"monastery","color":"blue","pic":"monastery.jpg","cost":3}))
 		for (i=0; i<2; i++) 
 			deck_content.pushObject(App.Card.create({"name":"cathedral","color":"blue","pic":"cathedral.jpg","cost":5}));
 		for (i=0; i<5; i++) 
 			deck_content.pushObject(App.Card.create({"name":"tavern","color":"green","pic":"tavern.jpg","cost":1}));
-		for (i=0; i<4; i++) 
+		for (i=0; i<3; i++) 
 			deck_content.pushObject(App.Card.create({"name":"store","color":"green","pic":"store.jpg","cost":2}));	
 		for (i=0; i<4; i++) 
 			deck_content.pushObject(App.Card.create({"name":"market","color":"green","pic":"market.jpg","cost":2}));
@@ -64,12 +89,12 @@ App.Deck = Ember.Object.extend({
 			deck_content.pushObject(App.Card.create({"name":"prison","color":"red","pic":"prison.jpg","cost":2}));
 		for (i=0; i<3; i++) 
 			deck_content.pushObject(App.Card.create({"name":"barracks","color":"red","pic":"barracks.jpg","cost":3}));	
-		for (i=0; i<3; i++) 
+		for (i=0; i<2; i++) 
 			deck_content.pushObject(App.Card.create({"name":"fortress","color":"red","pic":"fortress.jpg","cost":5}));
 		for (i=0; i<2; i++) 
 			deck_content.pushObject(App.Card.create({"name":"keep","color":"purple","pic":"keep.jpg","cost":3}));
 			
-		deck_content.pushObject(App.Card.create({"name":"city","color":false,"pic":"city.jpg","cost":2}));
+		deck_content.pushObject(App.Card.create({"name":"city","color":"city","pic":"city.jpg","cost":2}));
 		deck_content.pushObject(App.Card.create({"name":"observatory","color":"purple","pic":"observatory.jpg","cost":5}));
 		deck_content.pushObject(App.Card.create({"name":"lab","color":"purple","pic":"lab.jpg","cost":5}));
 		deck_content.pushObject(App.Card.create({"name":"workshop","color":"purple","pic":"workshop.jpg","cost":5}));
@@ -78,16 +103,47 @@ App.Deck = Ember.Object.extend({
 		deck_content.pushObject(App.Card.create({"name":"greatwall","color":"purple","pic":"greatwall.jpg","cost":6}));
 		deck_content.pushObject(App.Card.create({"name":"dragongate","color":"purple","pic":"dragongate.jpg","cost":6}));
 		deck_content.pushObject(App.Card.create({"name":"university","color":"purple","pic":"university.jpg","cost":6}));
-		deck_content.pushObject(App.Card.create({"name":"graveyard","color":"purple","pic":"graveyard.jpg","cost":5}));
-	
-		}
+		if (!this.inExtended(8)) deck_content.pushObject(App.Card.create({"name":"graveyard","color":"purple","pic":"graveyard.jpg","cost":5}));
 	},
-	cards_on_choose : Ember.computed('content.@each.status', function() {
-		return this.get('content').filterBy('status','on_choice').length > 0;
-	}),
-	card_on_graveyard : Ember.computed('content.@each.status', function() {
-		return this.get('content').findBy('status','on_graveyard');
-	})
+	extended_deck : [
+		{"name":"lighthouse","color":"purple","pic":"lighthouse.jpg","cost":3},
+		{"name":"museum","color":"purple","pic":"museum.jpg","cost":4},
+		{"name":"poorhouse","color":"purple","pic":"poorhouse.jpg","cost":4},
+		{"name":"belltower","color":"purple","pic":"belltower.jpg","cost":5},
+		{"name":"factory","color":"purple","pic":"factory.jpg","cost":5},
+		{"name":"quarry","color":"purple","pic":"quarry.jpg","cost":5},
+		{"name":"fountain","color":"purple","pic":"fountain.jpg","cost":5},
+		{"name":"ballroom","color":"purple","pic":"ballroom.jpg","cost":6},
+		{"name":"park","color":"purple","pic":"park.jpg","cost":6},
+		{"name":"hospital","color":"purple","pic":"hospital.jpg","cost":6},
+		{"name":"throneroom","color":"purple","pic":"throneroom.jpg","cost":6},
+		{"name":"armory","color":"purple","pic":"armory.jpg","cost":3},
+		{"name":"treasury","color":"purple","pic":"treasury.jpg","cost":4},
+		{"name":"maproom","color":"purple","pic":"maproom.jpg","cost":5}
+	],
+	initExtendedDeck : function() {
+		/*for test 
+		var extended_deck = this.get('extended_deck');
+		for (var i=0; i<extended_deck.length; i++)
+			this.get('content').pushObject(App.Card.create(extended_deck[i]));
+		*/
+		
+		var n, chosen = false, deck_content = this.get('content'), extended_deck = this.get('extended_deck');
+		for (var i=0; i<3; i++)
+		{
+			chosen = false;
+			while (!chosen) 
+			{
+				n = Math.floor(Math.random() * extended_deck.length);
+				if (!deck_content.findBy('name', extended_deck[n]["name"]))
+				{
+					chosen = true;
+					deck_content.pushObject(App.Card.create(extended_deck[n]));
+					console.log(extended_deck[n]["name"]);
+				}
+			}
+		}
+	}
 });
 
 App.Character = Ember.Object.extend({
@@ -101,19 +157,22 @@ App.Character = Ember.Object.extend({
 	}.property('built'),
 	used_workshop : false,
 	used_lab : false,
+	used_museum : false,
+	thanked : false,
 	status : 'in_round', //in_round, in_hand, discarded
     pic : "",
-	state : 'normal', //assasinated, robbed
+	state : 'normal', //assasinated, robbed, bewitched
 	reveal : function(game) {
 	   if (this.get('state') == 'assasinated' || this.get('status') == 'discarded') 
-	   {
-		   this.endTurn(game);
-		   return;
-	   }
+	   		if (!this.get('player') || !this.get('player').hasDistrict('hospital'))
+		    {
+		   		this.endTurn(game);
+		   		return;
+		    }
 	   
 	   if (this.get('state') == 'robbed')
 	   {
-		   var thief_owner = game.get('characters').get('content').findBy('name', 'Thief').get('player');
+		   var thief_owner = game.get('characters').get('content').findBy('name', 'Thief').get('handle_player');
 		   var coins = this.get('player').get('coins');
 		   this.get('player').set('coins', 0);
 		   thief_owner.set('coins', thief_owner.get('coins') + coins);
@@ -122,10 +181,14 @@ App.Character = Ember.Object.extend({
 	   this.set('handle_player', this.get('player'));
 	   game.set('activePlayer', this.get('handle_player'));
 	},
+	canTake : true,
 	takeCoins : function(game) {
 		if (this.get('took')) return;
 		this.get('handle_player').set('coins', this.get('handle_player').get('coins') + 2);
 		this.set('took', true);
+		this.checkAssasinated(game);
+		this.checkBewitched(game);
+		this.checkThanked(game);
 	},
 	chooseCard : function(game) {
 		if (this.get('took')) return;
@@ -152,6 +215,13 @@ App.Character = Ember.Object.extend({
 			}
 		}
 		this.set('took', true);
+		
+		if (this.get('handle_player').get('hasLibrary')) {
+			this.checkAssasinated(game);
+			this.checkBewitched(game);
+			this.checkThanked(game);
+		}	
+		
 	},
 	takeCard : function(game, card)
 	{
@@ -162,35 +232,95 @@ App.Character = Ember.Object.extend({
 			card.set('status','in_deck');
 			card.set('player',false);
 		});
-		this.get('handle_player').get('cards').pushObject(card);		
+		this.get('handle_player').get('cards').pushObject(card);
+		
+		if (!this.get('handle_player').get('hasLibrary')) {
+			this.checkAssasinated(game);
+			this.checkBewitched(game);
+			this.checkThanked(game);
+		}		
 	},
-	
 	build : function(game, card) {
 		if (this.get('built') == this.get('max_build')) return;
 		if (!this.get('took')) return;
 		if (card.get('status') != 'in_hand') return;
 		if (card.get('player')!== this.get('handle_player')) return;
 		
-		if (card.get('cost') > this.get('handle_player').get('coins'))
+		var build_cost = card.get('cost') - (this.get('handle_player').hasDistrict('factory') &&
+		(card.get('color') == 'purple' || card.get('color') == 'city'));
+		
+		if (build_cost > this.get('handle_player').get('coins'))
 		{
 			game.showError("You don't have enough coins to build this district");
 			return;
 		}
 		
-		if (this.get('handle_player').get('districts').filterBy('name', card.get('name')).length > 0)
+		if (this.get('handle_player').get('districts').filterBy('name', card.get('name')).length > this.get('handle_player').hasDistrict('quarry'))
 		{
 			game.showError("You can't build dublicate district");
 			return;
 		}
 				
-		card.set('status','built');			
+		card.set('status','built');
+		if (card.get('name') == 'belltower') this.get('handle_player').set('can_use_belltower', true);
+		if (card.get('name') == 'lighthouse') this.get('handle_player').set('can_use_lighthouse', true);			
 		this.get('handle_player').get('districts').pushObject(card);
-		this.get('handle_player').set('coins', this.get('handle_player').get('coins')-card.get('cost')); 
+		this.get('handle_player').set('coins', this.get('handle_player').get('coins')-build_cost); 
 		this.set('built',this.get('built')+1);
 		this.get('handle_player').get('cards').removeObject(card);
 	},
 	endTurn : function(game) {
+		if (this.get('status') == 'in_hand') this.payTax(game);
+		if (this.get('handle_player') 
+		    && !this.get('handle_player').get('coins') 
+		    && this.get('handle_player').hasDistrict("poorhouse"))
+		    this.get('handle_player').set('coins',1);
+		if (this.get('handle_player') 
+		    && !this.get('handle_player').get('cards').length 
+		    && this.get('handle_player').hasDistrict("park"))
+		    game.drawCards(this.get('handle_player'), 2);
+		if (this.get('handle_player') && this.get('handle_player').get('can_use_belltower'))
+			this.get('handle_player').set('can_use_belltower', false);
+		if (this.get('handle_player') && this.get('handle_player').get('using_lighthouse'))
+			this.get('handle_player').set('using_lighthouse', false);
+		if (this.get('handle_player') && this.get('handle_player').get('can_use_lighthouse'))
+			this.get('handle_player').set('can_use_lighthouse', false);
+		if (this.get('handle_player') && this.get('handle_player').get('exploding'))
+			this.get('handle_player').set('exploding', false);
 		game.nextCharacter();
+	},
+	payTax : function(game) {
+		var tax = game.get('characters').get('content').findBy('name', 'Tax');
+		if (tax && tax.get('status') == 'in_hand') {
+			if (tax.get('state') == 'assasinated') return;
+			var tax_owner = tax.get(this.get('isAssasin') ? 'player' : 'handle_player');
+			if (tax_owner === this.get('handle_player')) return;
+			if (!this.get('built')) return;
+			if (!this.get('handle_player').get('coins')) return;
+			this.get('handle_player').set('coins', this.get('handle_player').get('coins') - 1);
+			tax_owner.set('coins', tax_owner.get('coins') + 1);
+		}
+	},
+	checkBewitched : function(game) {
+		if (this.get('state') == 'bewitched') {
+			var witch_owner = game.get('characters').get('content').findBy('name', 'Witch').get('player');
+			this.set('handle_player', witch_owner);
+			game.set('activePlayer', witch_owner);
+		}
+	},
+	checkAssasinated : function(game) {
+		if (this.get('state') == 'assasinated') this.endTurn(game);
+	},
+	checkThanked : function(game) {
+		if (this.get('state') == 'bewitched') return;
+		var ballroom = game.get('deck').get('content').findBy('name', 'ballroom');
+		if (ballroom && ballroom.get('status') == 'built')
+		{
+			var ballroom_owner = ballroom.get('player');
+			if (ballroom_owner !== this.get('player')
+			&& ballroom_owner.get('has_crown') && !this.get('thanked'))
+				this.endTurn(game);
+		}
 	},
 	useWorkshop : function(game) {
 		if (!this.get('handle_player').get('hasWorkshop')) return;
@@ -211,7 +341,7 @@ App.Character = Ember.Object.extend({
 		if (!this.get('handle_player').get('hasLab')) return;
 		if (this.get('used_lab')) return;
 		
-		if (card.get('status') == 'in_hand' && card.get('player') === this.get('handle_player'))
+		if ((card.get('status') == 'in_hand' || card.get('status') == 'on_wizard') && card.get('player') === this.get('handle_player'))
 		{
 			card.set('status', 'in_lab');
 			card.set('player', false);
@@ -219,6 +349,19 @@ App.Character = Ember.Object.extend({
 			this.get('handle_player').set('coins', this.get('handle_player').get('coins') + 1);
 			this.set('used_lab', true);
 		}
+	},
+	underMuseum : function(game, card) {
+		if (!this.get('handle_player').get('hasMuseum')) return;
+		if (this.get('used_museum')) return;
+		if (card.get('status') != 'in_hand' && card.get('status') != 'on_wizard') return;
+		if (card.get('player') !== this.get('handle_player')) return;
+		
+		card.set('status', 'in_museum');
+		this.get('handle_player').get('cards').removeObject(card);
+		card.set('player', false);
+		game.get('player1').set('cards_under_museum', game.get('player1').get('cards_under_museum') + 1);
+		game.get('player2').set('cards_under_museum', game.get('player2').get('cards_under_museum') + 1);
+		this.set('used_museum', true);
 	},
 	resetParams : function() {
 		this.set('player', false);
@@ -229,6 +372,12 @@ App.Character = Ember.Object.extend({
 		this.set('status','in_round');
 		this.set('used_workshop', false);
 		this.set('used_lab', false);
+		this.set('used_museum', false);
+		this.set('thanked', false);
+	},
+	thanksYourExcellency : function() {
+		this.set('thanked', true);
+		console.log(this.get('thanked'));
 	},
 	inRound : function() {
 		return this.get('status') == 'in_round';
@@ -239,6 +388,9 @@ App.Character = Ember.Object.extend({
 	isRobbed : function() {
 		return this.get('state') == 'robbed';
 	}.property('state'),
+	isBewitched : function() {
+		return this.get('state') == 'bewitched';
+	}.property('state'),
 	serialize : function() {
 		return {
 			"player" : this.get('player') ? this.get('player').get('name') : false,
@@ -247,8 +399,10 @@ App.Character = Ember.Object.extend({
 			"built" : this.get('built'),
 			"used_workshop" : this.get('used_workshop'),
 			"used_lab" : this.get('used_lab'),
+			"used_museum" : this.get('used_museum'),
 			"status" : this.get('status'),
-			"state" : this.get('state')
+			"state" : this.get('state'),
+			"thanked" : this.get('thanked')
 		}	
 	}
 });
@@ -341,30 +495,14 @@ App.Magician = App.Character.extend({
 		var n, draw;
 		var deck_content = game.get('deck').get('content');
 		var checked_cards = deck_content.filterBy('isChecked', true);
-		for (var i=0; i<checked_cards.length; i++)
-		{
-			draw = false;
-			while (!draw)
-			{
-				n = Math.floor(Math.random() * deck_content.length);
-				
-				if (deck_content.objectAt(n).get('status') == 'in_deck')
-				{
-					card = deck_content.objectAt(n);
-					card.set('status', 'in_hand');
-					card.set('player', this.get('handle_player'));
-					this.get('handle_player').get('cards').pushObject(card);
-					draw = true;
-				}
-			}
-		}
+		game.drawCards(this.get('handle_player'), checked_cards.length);
 		
 		var that = this;
 		checked_cards.forEach(function(item) {
 			item.set('isChecked', false);
 			item.set('status', 'in_deck');
 			item.set('player', false);
-			that.get('player').get('cards').removeObject(item);
+			that.get('handle_player').get('cards').removeObject(item);
 		});
 		
 		this.set('choosed_to_discard', false);
@@ -418,9 +556,14 @@ App.King = App.ColourCharacter.extend({
 		
 		if (this.get('status') == 'in_hand')
 		{
+			var old_crown_owner = game.get('player1').get('has_crown') ? game.get('player1') : game.get('player2');
 			game.get('player1').set('has_crown', false);
 			game.get('player2').set('has_crown', false);
 			this.get('player').set('has_crown', true);
+			if (old_crown_owner!==this.get('player')) {
+				if (game.get('player1').hasDistrict("throneroom")) game.get('player1').set('coins', game.get('player1').get('coins')+1);
+				if (game.get('player2').hasDistrict("throneroom")) game.get('player2').set('coins', game.get('player2').get('coins')+1);
+			}
 		}
 		
 		this._super(game);
@@ -483,7 +626,7 @@ App.Warlord = App.ColourCharacter.extend({
 		
 		if (player_to.get('closed')) 
 		{
-			game.showError("You can't destroy district in the city with 8 or more districts"); 
+			game.showError("You can't destroy district in the city with "+player_to.get('districts_to_close')+" or more districts"); 
 			return;
 		}
 		
@@ -494,7 +637,7 @@ App.Warlord = App.ColourCharacter.extend({
 		}
 		
 		var bishop = game.get('characters').get('content').findBy('name','Bishop');
-		if (bishop && bishop.get('state')=='normal' && bishop.get('player') === player_to)
+		if (bishop && bishop.get('state')!='assasinated' && bishop.get('handle_player') === player_to)
 		{
 			game.showError("You can't destroy Bishop's district"); 
 			return;
@@ -511,6 +654,7 @@ App.Warlord = App.ColourCharacter.extend({
 			this.get('handle_player').set('coins',this.get('handle_player').get('coins')-district.get('cost')-player_to.get('hasGreatwall')+1);
 			player_to.get('districts').removeObject(district);
 			district.set('status', player_to.get('hasGraveyard') && player_to.get('coins') ? 'on_graveyard' : 'destroyed');
+			if (district.get('name') == 'belltower') player_to.cancelRing(game);
 			district.set('player', false);
 			this.set('destroyed',true);
 		}
@@ -526,18 +670,290 @@ App.Warlord = App.ColourCharacter.extend({
 	}
 });
 
+App.Witch = App.Character.extend({
+	name : "Witch",
+	isWitch : true,
+	number : 1,
+	pic : "character11.jpg",
+	max_build: 0,
+	bewitched : false,
+	bewitch : function(character) {
+		if (this.get('bewitched')) return;
+		if (character.get('isWitch')) return;
+		character.set('state','bewitched');
+		this.set('bewitched', true);
+	},
+	resetParams : function() {
+		this._super();
+		this.set('bewitched', false);
+	},
+	serialize : function() {
+		var ret = this._super();
+		ret['bewitched'] = this.get('bewitched');
+		return ret;
+	}
+});
+
+App.TaxCollector = App.Character.extend({
+	name : "Tax",
+	number : 2,
+	pic : "character12.jpg"
+});
+
+App.Wizard = App.Character.extend({
+	name: "Wizard",
+	number : 3,
+	pic: "character13.jpg",
+	isWizard : true,
+	stole : false,
+	wizard_built : false,
+	stealCard : function(player, card) {
+		if (this.get('stole')) return;
+		card.set('status', 'on_wizard');
+		card.set('player', this.get('handle_player'));
+		player.get('cards').removeObject(card);
+		this.get('handle_player').get('cards').pushObject(card);
+		this.set('stole', true);
+	},
+	wizardBuild : function(game, card) {
+		if (this.get('wizard_built')) return;
+		if (card.get('status') != 'on_wizard') return;
+		if (card.get('player')!== this.get('handle_player')) return;
+		
+		var build_cost = card.get('cost') - (this.get('handle_player').hasDistrict('factory') &&
+		(card.get('color') == 'purple' || card.get('color') == 'city'));
+		
+		if (build_cost > this.get('handle_player').get('coins'))
+		{
+			game.showError("You don't have enough coins to build this district");
+			return;
+		}
+			
+		card.set('status','built');			
+		this.get('handle_player').get('districts').pushObject(card);
+		this.get('handle_player').set('coins', this.get('handle_player').get('coins')-build_cost); 
+		this.set('wizard_built', true);
+		this.get('handle_player').get('cards').removeObject(card);
+	},
+	resetParams : function() {
+		this._super();
+		this.set('stole', false);
+		this.set('wizard_built', false);
+	},
+	endTurn : function(game) {
+		if (this.get('status') == 'in_hand' && this.get('state')!='assasinated')
+		{
+			this.get('handle_player').get('cards').forEach(function(card) {
+				card.set('status', 'in_hand');
+			});
+		}
+		
+		this._super(game);
+	},
+	serialize : function() {
+		var ret = this._super();
+		ret['stole'] = this.get('stole');
+		ret['wizard_built'] = this.get('wizard_built');
+		return ret;
+	}
+});
+
+App.Emperor = App.ColourCharacter.extend({
+	name: "Emperor",
+	number: 4,
+	color: "yellow",
+	pic: "character14.jpg",
+	isEmperor: true,
+	coronated: false,
+	resetParams : function() {
+		this._super();
+		this.set('coronated', false);
+	},
+	serialize : function() {
+		var ret = this._super();
+		ret['coronated'] = this.get('coronated');
+		return ret;
+	},
+	canTake : function() {
+		return this.get('coronated') || this.get('state') == 'bewitched';
+	}.property('coronated'),
+	coronate : function(game, player) {
+		if (player!==this.get('handle_player')) 
+		{
+			if (!player.get('coins')) {
+				player.giveCardForCrown(game);
+				this.set('coronated', true);
+			}
+			else if (!player.get('cards').length) {
+				player.giveCoinForCrown(game);
+				this.set('coronated', true);
+			}
+			else player.set('on_coronation', true);
+		}
+	}
+});
+
+App.Abbot = App.ColourCharacter.extend({
+	name: "Abbot",
+	number: 5,
+	color: "blue",
+	pic: "character15.jpg",
+	reveal : function(game) {
+		if (this.get('state') == 'assasinated' || this.get('status') == 'discarded' || this.get('state') == 'bewitched')
+		{
+			this._super(game);
+		}
+		else {
+			this._super(game);
+			this.stealCoin(game);
+		} 
+	},
+	checkBewitched : function(game) {
+		this._super(game);
+		this.stealCoin(game);
+	},
+	stealCoin : function(game) {
+		var handle_player = this.get('handle_player');
+		var player_from = handle_player === game.get('player2') ? game.get('player1') : game.get('player2');
+		if (player_from.get('coins') > handle_player.get('coins'))
+		{
+			player_from.set('coins', player_from.get('coins') - 1);
+			handle_player.set('coins', handle_player.get('coins') + 1);
+		}
+	}
+});
+
+App.Alchemist = App.Character.extend({
+	name: "Alchemist",
+	number: 6,
+	pic: "character16.jpg",
+	build : function(game, card) {
+		if (this.get('built') == this.get('max_build')) return;
+		var coins_to_return = card.get('cost') - (this.get('handle_player').hasDistrict('factory') &&
+		(card.get('color') == 'purple' || card.get('color') == 'city'));
+		this._super(game, card);
+		if (this.get('built')) this.get('handle_player').set('coins', this.get('handle_player').get('coins') + coins_to_return);
+	}
+});
+
+App.Navigator = App.Character.extend({
+	name: "Navigator",
+	isNavigator: true,
+	number: 7,
+	max_build: 0,
+	pic: "character17.jpg",
+	navigated: false,
+	take4Cards : function(game) {
+		if (this.get('navigated')) return;
+		game.drawCards(this.get('handle_player'), 4);
+		this.set('navigated', true);
+	},
+	take4Coins : function() {
+		if (this.get('navigated')) return;
+		this.get('handle_player').set('coins', this.get('handle_player').get('coins') + 4);
+		this.set('navigated', true);
+	},
+	resetParams : function() {
+		this._super();
+		this.set('navigated', false);
+	},
+	serialize : function() {
+		var ret = this._super();
+		ret['navigated'] = this.get('navigated');
+		return ret;
+	}
+});
+
+App.Diplomat = App.ColourCharacter.extend({
+	name: "Diplomat",
+	isDiplomat: true,
+	number: 8,
+	color: "red",
+	pic: "character18.jpg",
+	swapped: false,
+	resetParams : function() {
+		this._super();
+		this.set('swapped', false);
+	},
+	serialize : function() {
+		var ret = this._super();
+		ret['swapped'] = this.get('swapped');
+		return ret;
+	},
+	swap : function(game, player, district) {
+			if (this.get('swapped')) return;
+			if (player === this.get('handle_player')) return;
+			if (district.get('status') == 'on_swap') return;
+			if (district.get('player').get('districts').filterBy('status', 'on_swap').length) return;
+			district.set('status', 'on_swap');
+			if (!this.get('handle_player').get('districts').filterBy('status', 'on_swap').length ||
+			!player.get('districts').filterBy('status', 'on_swap').length) return;
+			var compensation = 0;
+			var your_district = this.get('handle_player').get('districts').findBy('status', 'on_swap');
+			var enemy_district = player.get('districts').findBy('status', 'on_swap');
+			
+			if (player.get('closed')) 
+			{
+				game.showError("You can't swap district in the city with "+player.get('districts_to_close')+" or more districts"); 
+				
+			}
+			else if (enemy_district.get('name') == 'keep')
+			{
+				game.showError("Keep can not be swapped");
+			}
+			else if (player.get('characters').findBy('name', 'Bishop') && player.get('characters').findBy('name', 'Bishop').get('state')!='assasinated'
+			&& player.get('characters').findBy('name', 'Bishop').get('handle_player') === player)
+			{
+				game.showError("You cannot swap with Bishop");
+			}
+			else if (enemy_district.get('cost') + player.get('hasGreatwall') > your_district.get('cost') + this.get('handle_player').get('coins'))
+			{
+				game.showError("Not enough coins to swap this district");
+			}
+			else if (player.get('districts').filterBy('name', your_district.get('name')).length > player.hasDistrict('quarry')
+			|| this.get('handle_player').get('districts').filterBy('name', enemy_district.get('name')).length > this.get('handle_player').hasDistrict('quarry'))
+			{
+			    game.showError("You cannot swap dublicate districts");
+			}
+			else {
+				if (enemy_district.get('cost') + player.get('hasGreatwall') > your_district.get('cost'))
+					compensation = enemy_district.get('cost') + player.get('hasGreatwall') - your_district.get('cost');
+				this.get('handle_player').set('coins', this.get('handle_player').get('coins') - compensation);
+				player.set('coins', player.get('coins') + compensation);
+				player.get('districts').removeObject(enemy_district);
+				player.get('districts').pushObject(your_district);
+				this.get('handle_player').get('districts').removeObject(your_district);
+				this.get('handle_player').get('districts').pushObject(enemy_district);
+				your_district.set('player', player);
+				enemy_district.set('player', this.get('handle_player'));
+				this.set('swapped', true);
+			}
+			
+			your_district.set('status', 'built');
+			enemy_district.set('status', 'built');
+	}
+});
+
 App.Characters = Ember.Object.extend({
 	init() {
 		this.set('content', []);
 		var characters_content = this.get('content');
-		characters_content.pushObject(App.Assasin.create());
-		characters_content.pushObject(App.Thief.create());
-		characters_content.pushObject(App.Magician.create());
-		characters_content.pushObject(App.King.create());
-		characters_content.pushObject(App.Bishop.create());
-		characters_content.pushObject(App.Merchant.create());
-		characters_content.pushObject(App.Architect.create());
-		characters_content.pushObject(App.Warlord.create());
+		characters_content.pushObject(this.inExtended(1) ? App.Witch.create() : App.Assasin.create());
+		characters_content.pushObject(this.inExtended(2) ? App.TaxCollector.create() : App.Thief.create());
+		characters_content.pushObject(this.inExtended(3) ? App.Wizard.create() : App.Magician.create());
+		characters_content.pushObject(this.inExtended(4) ? App.Emperor.create() : App.King.create());
+		characters_content.pushObject(this.inExtended(5) ? App.Abbot.create() : App.Bishop.create());
+		characters_content.pushObject(this.inExtended(6) ? App.Alchemist.create() : App.Merchant.create());
+		characters_content.pushObject(this.inExtended(7) ? App.Navigator.create() : App.Architect.create());
+		characters_content.pushObject(this.inExtended(8) ? App.Diplomat.create() : App.Warlord.create());
+	},
+	extended : [],
+	inExtended : function(number) {
+		var extended = this.get('extended');
+		for (var j=0; j<extended.length; j++)
+			if (number == extended[j])
+				return true;
+		return false;
 	}
 });
 
@@ -545,12 +961,56 @@ App.Player = Ember.Object.extend({
 	is_robot: false,
 	has_crown : false,
 	name : null,
-	closed : Ember.computed('districts.length', function() {
-		return this.get('districts').length >= 8;
+	closed : Ember.computed('districts.length', 'districts_to_close', function() {
+		return this.get('districts').length >= this.get('districts_to_close');
 	}),
 	closed_first : false,
+	districts_to_close : 8,
 	coins : 2,
-	score : Ember.computed('districts.[]', 'hasDragongate', 'hasUniversity', 'closed', 'closed_first', function() {
+	cards_under_museum : 0,
+	on_coronation: false,
+	districtOnSwap : Ember.computed('districts.@each.status', function() {
+		return this.get('districts').filterBy('status', 'on_swap').length;
+	}),
+	giveCoinForCrown : function(game) {
+		var emperor = game.get('characters').get('content').findBy('name', 'Emperor');
+		var emperor_owner = emperor.get('handle_player');
+		this.set('coins', this.get('coins') - 1);
+		emperor_owner.set('coins', emperor_owner.get('coins') + 1);
+		emperor.set('coronated', true);
+		var old_crown_owner = game.get('player1').get('has_crown') ? game.get('player1') : game.get('player2');
+		game.get('player1').set('has_crown', false);
+		game.get('player2').set('has_crown', false);
+		this.set('has_crown', true);
+		if (old_crown_owner!==this) {
+			if (game.get('player1').hasDistrict("throneroom")) game.get('player1').set('coins', game.get('player1').get('coins')+1);
+			if (game.get('player2').hasDistrict("throneroom")) game.get('player2').set('coins', game.get('player2').get('coins')+1);
+		}
+		this.set('on_coronation', false);
+	},
+	giveCardForCrown : function(game) {
+		var emperor = game.get('characters').get('content').findBy('name', 'Emperor');
+		var emperor_owner = emperor.get('handle_player');
+		var cards = this.get('cards');
+		if (cards.length) {
+			var n = Math.floor(Math.random() * cards.length);
+			var given_card = cards.objectAt(n);
+			given_card.set('player', emperor_owner);
+			cards.removeObject(given_card);
+			emperor_owner.get('cards').pushObject(given_card);
+		}
+		emperor.set('coronated', true);
+		var old_crown_owner = game.get('player1').get('has_crown') ? game.get('player1') : game.get('player2');
+		game.get('player1').set('has_crown', false);
+		game.get('player2').set('has_crown', false);
+		this.set('has_crown', true);
+		if (old_crown_owner!==this) {
+			if (game.get('player1').hasDistrict("throneroom")) game.get('player1').set('coins', game.get('player1').get('coins')+1);
+			if (game.get('player2').hasDistrict("throneroom")) game.get('player2').set('coins', game.get('player2').get('coins')+1);
+		}
+		this.set('on_coronation', false);
+	},
+	score : Ember.computed('districts.[]', 'closed', 'closed_first', 'coins', 'cards.[]', 'cards_under_museum', function() {
     	var ret = 0;
 		var colors = [];
 		this.get('districts').forEach(function(item) {
@@ -558,9 +1018,17 @@ App.Player = Ember.Object.extend({
 			if (item.get('color')) colors.push(item.get('color'));
 		});
 		
-		if (this.get('hasDragongate')) ret += 2;
-		if (this.get('hasUniversity')) ret += 2;
-		if (colors.uniq().length + this.get('hasCity') >= 5) ret += 3;
+		ret += this.hasDistrict('fountain') * 
+		(this.get('districts').filterBy('color', 'purple').length
+		 + this.get('districts').filterBy('color', 'city').length
+		 - this.hasDistrict('fountain'));
+		ret += this.hasDistrict('treasury') * this.get('coins');
+		ret += this.hasDistrict('maproom') * this.get('cards').length;
+		ret += this.hasDistrict('museum') * this.get('cards_under_museum');
+		 
+		if (this.hasDistrict('dragongate')) ret += 2;
+		if (this.hasDistrict('university')) ret += 2;
+		if (colors.uniq().length >= 5) ret += 3;
 		if (this.get('closed')) ret += 2;
 		if (this.get('closed_first')) ret += 2;
 		
@@ -604,6 +1072,75 @@ App.Player = Ember.Object.extend({
 	hasCity : Ember.computed('districts.[]', function() {
 		return this.hasDistrict('city');
 	}),
+	hasFountain : Ember.computed('districts.[]', function() {
+		return this.hasDistrict('fountain');
+	}),
+	hasArmory : Ember.computed('districts.[]', function() {
+		return this.hasDistrict('armory');
+	}),
+	hasMuseum : Ember.computed('districts.[]', function() {
+		return this.hasDistrict('museum');
+	}),
+	hasLighthouse : Ember.computed('districts.[]', function() {
+		return this.hasDistrict('lighthouse');
+	}),
+	hasBallroom : Ember.computed('districts.[]', function() {
+		return this.hasDistrict('ballroom');
+	}),
+	can_use_belltower : false,
+	exploging : false,
+	can_use_lighthouse : false,
+	using_lighthouse : false,
+	useLighthouse : function() {
+		if (this.get('can_use_lighthouse'))
+			this.set('using_lighthouse', true);
+	},
+	lighthouseTake : function(card) {
+		if (this.get('using_lighthouse')) {
+			card.set('status', 'in_hand');
+			card.set('player', this);
+			this.get('cards').pushObject(card);
+			this.set('using_lighthouse', false);
+			this.set('can_use_lighthouse', false);
+		}
+	},
+	ringTheBell : function(game) {
+		if (this.get('can_use_belltower')) {
+			game.get('player1').set('districts_to_close', 7);
+			game.get('player2').set('districts_to_close', 7);
+			this.set('can_use_belltower', false);
+		}
+	},
+	cancelRing : function(game) {
+			game.get('player1').set('districts_to_close', 8);
+			game.get('player2').set('districts_to_close', 8);
+	},
+	onExplode : function() {
+		if (this.get('hasArmory')) this.set('exploding', true);
+	},
+	explodeArmory : function(game, district) {
+		if (this.get('exploding')) {
+			var armory = this.get('districts').findBy('name', 'armory');
+			armory.set('status', 'destroyed');
+			armory.set('player', false);
+			this.get('districts').removeObject(armory);
+			district.set('status', 'destroyed');
+			if (district.get('player')) 
+			{
+				var district_owner = district.get('player');
+				district_owner.get('districts').removeObject(district);
+				if (district.get('name') == 'belltower') district_owner.cancelRing(game);
+				if (district_owner.get('districts').length < district_owner.get('districts_to_close'))
+				{
+					district_owner.set('closed_first', false);
+					game.set('first_full_city', false);
+				}
+			}
+			
+			district.set('player', false);
+			this.set('exploding', false);
+		}
+	},
 	useGraveyard : function(game, pay) {
 		if (!this.get('hasGraveyard')) return;
 		if (this.get('coins') < 1) return;
@@ -634,7 +1171,14 @@ App.Player = Ember.Object.extend({
 		"is_robot" : this.get("is_robot"),
 		"has_crown" : this.get("has_crown"),
 		"coins" : this.get("coins"),
-		"closed_first" : this.get("closed_first")
+		"closed_first" : this.get("closed_first"),
+		"on_coronation" : this.get("on_coronation"),
+		"districts_to_close" : this.get("districts_to_close"),
+		"can_use_belltower" : this.get("can_use_belltower"),
+		"can_use_lighthouse" : this.get("can_use_lighthouse"),
+		"using_lighthouse" : this.get("using_lighthouse"),
+		"exploding" : this.get("exploding"),
+		"cards_under_museum" : this.get("cards_under_museum")
 		};
 	}
 });
@@ -650,6 +1194,7 @@ App.Game = Ember.Object.extend({
 	currentCharacter : null,
 	first_full_city : false,
 	winner : "",
+	extended : [],
 	setWinner : function() {
 		var winner;
 		if (this.get('player1').get('score') > this.get('player2').get('score'))
@@ -664,9 +1209,10 @@ App.Game = Ember.Object.extend({
 	},
 	phaze : null, //start, choose, discard, action,  end
 	
-	start : function(name, player1_name, player2_name) {
+	start : function(name, player1_name, player2_name, extended) {
 			
 			this.set('name',name);
+			this.set('extended', extended);
 			
 			var player1 = App.Player.create({ name :  player1_name, districts : [], characters : [], cards : []});
 			var player2 = App.Player.create({ name :  player2_name, is_robot : true, districts : [], characters : [], cards : []});
@@ -675,7 +1221,7 @@ App.Game = Ember.Object.extend({
 			this.setFirstPlayer();
 			this.get('activePlayer').set('has_crown',true);
 			
-			var deck = App.Deck.create(); 
+			var deck = App.Deck.create({extended : this.get('extended')}); 
 			this.set('deck',deck);
 			
 			this.drawCards(this.get('player1'), 4);
@@ -683,7 +1229,7 @@ App.Game = Ember.Object.extend({
 			
 			this.set('currentCharacter', null);
 			
-			var characters = App.Characters.create();
+			var characters = App.Characters.create({extended : this.get('extended')});
 			this.set('characters', characters);
 			this.resetCharacters();
 			this.set('phaze','choose');
@@ -699,6 +1245,7 @@ App.Game = Ember.Object.extend({
 	restart : function() {
 		this.set('first_full_city', false);
 		this.set('winner', '');
+		this.set('extended', []);
 		this.set('phaze','start');
 	},
 	showError : function(text) {
@@ -721,6 +1268,7 @@ App.Game = Ember.Object.extend({
 		this.set('name', game.name);
 		this.set('first_full_city', game.first_full_city);
 		this.set('phaze', game.phaze);
+		this.set('extended', game.extended);
 		this.set('player1', App.Player.create(game.player1));
 		this.set('player2', App.Player.create(game.player2));
 		
@@ -729,18 +1277,18 @@ App.Game = Ember.Object.extend({
 		gamePlayers.pushObject(this.get('player2'));
 		this.set('activePlayer', gamePlayers.findBy('name', game.activePlayer));
 		
-		this.set('deck', App.Deck.create({ init_deck : game.deck }));
+		this.set('deck', App.Deck.create({ init_deck : game.deck, extended : game.extended }));
 		this.get('deck').get('content').forEach(function(card) {
 			if (card.get('player')) 
 			{
 				owner = gamePlayers.findBy('name', card.get('player'));
 				card.set('player', owner);
-				if (card.get('status') == 'in_hand') owner.get('cards').pushObject(card);
-				if (card.get('status') == 'built') owner.get('districts').pushObject(card);
+				if (card.get('status') == 'in_hand' || card.get('status') == 'on_wizard') owner.get('cards').pushObject(card);
+				if (card.get('status') == 'built' || card.get('status') == 'on_swap') owner.get('districts').pushObject(card);
 			}
 		});
 		
-		var characters = App.Characters.create();
+		var characters = App.Characters.create({extended : game.extended});
 		var character_data;
 		
 		characters.get('content').forEach(function(character) {
@@ -771,6 +1319,7 @@ App.Game = Ember.Object.extend({
 		"currentCharacter" : this.get("currentCharacter") ? this.get("currentCharacter").get("number") : null,
 		"first_full_city" : this.get("first_full_city"),
 		"phaze" : this.get("phaze"),
+		"extended" : this.get("extended"),
 		"characters" : (function() {
 			var charactersArr = [];
 			that.get("characters").get("content").forEach(function(character) {
@@ -815,6 +1364,20 @@ App.Game = Ember.Object.extend({
 	robotActivePlayer : function() {
   		return this.get('activePlayer') === this.get('player2');
 	}.property('activePlayer'),
+	player1Blocked : Ember.computed('activePlayer', 'player1', 'player2', 'currentCharacter', 'currentCharacter.thanked', function() {
+		return (this.get('currentCharacter').get('state') == 'bewitched' && this.get('currentCharacter').get('player') === this.get('player1')
+		&& this.get('activePlayer') === this.get('player1')) || (this.get('currentCharacter').get('state') == 'assasinated' && 
+		this.get('currentCharacter').get('player') === this.get('player1'))
+		|| (this.get('player2').get('hasBallroom') && this.get('player2').get('has_crown') && this.get('currentCharacter').get('state') != 'bewitched' 
+		&& !this.get('currentCharacter').get('thanked'));
+	}),
+	player2Blocked : Ember.computed('activePlayer', 'player1', 'player2','currentCharacter', 'currentCharacter.thanked', function() {
+		return (this.get('currentCharacter').get('state') == 'bewitched' && this.get('currentCharacter').get('player') === this.get('player2')
+		&& this.get('activePlayer') === this.get('player2')) || (this.get('currentCharacter').get('state') == 'assasinated' && 
+		this.get('currentCharacter').get('player') === this.get('player2'))
+		|| (this.get('player1').get('hasBallroom') && this.get('player1').get('has_crown') && this.get('currentCharacter').get('state') != 'bewitched' 
+		&& !this.get('currentCharacter').get('thanked'));
+	}),
 	toggleActivePlayer : function() {
 		if (this.get('activePlayer') === this.get('player1')) this.set('activePlayer', this.get('player2'));
 		else if (this.get('activePlayer') === this.get('player2')) this.set('activePlayer', this.get('player1'));
@@ -866,6 +1429,9 @@ App.Game = Ember.Object.extend({
 			player.set('closed_first', true);
 		}
 	},
+	districtsOnSwapText : function() {
+		
+	},
 	nextCharacter : function() {
 		
 		this.checkFirstClosed(this.get('activePlayer'));
@@ -896,11 +1462,6 @@ App.Game = Ember.Object.extend({
 
 		character = this.get('currentCharacter');
 		character.reveal(this);
-	},
-	stealCoins : function(player_from, player_to)
-	{
-		player_to.set('coins',player_to.get('coins')+player_from.get('coins'));
-		player_from.set('coins',0);
 	},
 	resetCharacters : function() {
 
@@ -934,7 +1495,16 @@ App.IndexRoute = Ember.Route.extend({
   game : null,
   actions : {
   		start : function(gameName, yourName, robotName) {
-  			this.get('game').start(gameName || "New Game", yourName || "Human", robotName || "Robot");
+
+  		   var game_type = $('input[name="game_type"]:checked').val();
+  		   var extended = [];
+  		   if (game_type == 'extended') {
+  		   	 var gen_arr = [1,2,3,4,5,6,7,8];
+  		   	 extended = extended.concat(gen_arr.splice(Math.floor(Math.random() * gen_arr.length), 1))
+  		   	         .concat(gen_arr.splice(Math.floor(Math.random() * gen_arr.length), 1));
+  		   }
+
+  		   this.get('game').start(gameName || "New Game", yourName || "Human", robotName || "Robot", extended);
   		},
   		finish : function() {
   			this.get('game').finish();
@@ -981,6 +1551,11 @@ App.IndexRoute = Ember.Route.extend({
 			var game = this.get('game');
 			this.get('game').get('currentCharacter').assasinate(character);
 		},
+		bewitchCharacter : function(character)
+		{
+			var game = this.get('game');
+			this.get('game').get('currentCharacter').bewitch(character);
+		},
 		robCharacter : function(character)
 		{
 			var game = this.get('game');
@@ -1004,15 +1579,44 @@ App.IndexRoute = Ember.Route.extend({
 			var character = game.get('currentCharacter');
 			character.discardCards(game);
 		},
+		stealCard : function(card) {
+			var game = this.get('game');
+			var character = game.get('currentCharacter');
+			var player = game.get('activePlayer') === game.get('player2') ? game.get('player1') : game.get('player2');
+			character.stealCard(player, card);
+		},
+		wizardBuild : function(card) {
+			var game = this.get('game');
+			var character = game.get('currentCharacter');
+			character.wizardBuild(game, card);
+		},
+		coronate : function(player) {
+			this.get('game').get('currentCharacter').coronate(this.get('game'), player);
+		},
+		giveCoinForCrown : function(player) {
+			player.giveCoinForCrown(this.get('game'));
+		},
+		giveCardForCrown : function(player) {
+			player.giveCardForCrown(this.get('game'));
+		},
+		take4Coins : function() {
+			this.get('game').get('currentCharacter').take4Coins();
+		},
+		take4Cards : function() {
+			this.get('game').get('currentCharacter').take4Cards(this.get('game'));
+		},
 		takeIncome : function()
 		{
 			this.get('game').get('currentCharacter').takeIncome();
 		},
-		destroy : function(district) {
+		destroyOrSwap : function(district) {
 			var game = this.get('game');
 			var player_to = game.get('activePlayer') === game.get('player2') ? game.get('player1') : game.get('player2');
+			if (game.get('activePlayer') === game.get('player1') && game.get('player1Blocked')) return;
+			if (game.get('activePlayer') === game.get('player2') && game.get('player2Blocked')) return;
 			var character = game.get('currentCharacter');
 			if (character && character.get('isWarlord')) character.destroy(game, player_to, district);
+			if (character && character.get('isDiplomat')) character.swap(game, player_to, district);
 		},
 		useWorkshop : function() {
 			var game = this.get('game');
@@ -1022,6 +1626,28 @@ App.IndexRoute = Ember.Route.extend({
 		toLab : function(card) {
 			var character = this.get('game').get('currentCharacter');
 			character.useLab(card);
+		},
+		toMuseum : function(card) {
+			var character = this.get('game').get('currentCharacter');
+			character.underMuseum(this.get('game'), card);
+		},
+		ringTheBell : function() {
+			this.get('game').get('activePlayer').ringTheBell(this.get('game'));
+		},
+		onExplode : function() {
+			this.get('game').get('activePlayer').onExplode();
+		},
+		explode : function(district) {
+			this.get('game').get('activePlayer').explodeArmory(this.get('game'), district);
+		},
+		useLighthouse : function() {
+			this.get('game').get('activePlayer').useLighthouse();
+		},
+		lighthouseTake : function(card) {
+			this.get('game').get('activePlayer').lighthouseTake(card);
+		},
+		thanksYourExcellency : function() {
+			this.get('game').get('currentCharacter').thanksYourExcellency();
 		},
 		yesGraveyard : function() {
 			var game = this.get('game');

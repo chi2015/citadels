@@ -29,11 +29,21 @@
 					<div class="game-type-block">
 						<p>Game type:</p>
 						<div class="input-radio-block">
-							<input type="radio" value="classic" name="game_type" checked="checked"/>
+							{{#unless model.extended.length}}
+								<input type="radio" value="classic" name="game_type" checked="checked"/>
+							{{/unless}}
+							{{#if model.extended.length}}
+								<input type="radio" value="classic" name="game_type"/>
+							{{/if}}
 							<label>Classic</label>
 						</div>
 						<div class="input-radio-block">
-							<input type="radio" value="extended" name="game_type" disabled="disabled"/>
+							{{#if model.extended.length}}
+								<input type="radio" value="extended" name="game_type" checked="checked"/>
+							{{/if}}
+							{{#unless model.extended.length}}
+								<input type="radio" value="extended" name="game_type"/>
+							{{/unless}}
 							<label>Extended</label>
 						</div>
 					</div>
@@ -53,7 +63,13 @@
 				{{#if model.phazeIsAction }}
 					King summons {{model.currentCharacter.name}}.
 				{{/if}}
-			{{model.activePlayer.name}}'s turn</h2>
+				{{#unless model.player1.on_coronation}}
+				{{#unless model.player2.on_coronation}}
+					{{model.activePlayer.name}}'s turn
+				{{/unless}}
+				{{/unless}}
+			{{#if model.player1.on_coronation}}{{model.player1.name}}'s turn{{/if}}
+			{{#if model.player2.on_coronation}}{{model.player2.name}}'s turn{{/if}}</h2>
 			{{/unless}}
 			{{#if model.phazeIsEnd }}
 			<h2>Game finished! The winner is {{model.winner}}</h2>
@@ -90,6 +106,7 @@
 				</div>
 			{{/if}}
 			{{#if model.phazeIsAction }}
+				{{#unless model.player1Blocked}}
 				{{#if model.currentCharacter.isAssasin}}
 					{{#unless model.currentCharacter.assasinated }}
 					<p>Choose character to assasinate</p>
@@ -102,15 +119,31 @@
 					</div>
 					{{/unless}}
 				{{/if}}
+				{{#if model.currentCharacter.isWitch}}
+					{{#unless model.currentCharacter.bewitched }}
+					<p>Choose character to bewitch</p>
+					<div class="cards-list">
+					{{#each model.characters.content as |character|}}
+						{{#unless character.isWitch}}
+							<img {{action "bewitchCharacter" character}} src="characters/{{character.pic}}"/>
+						{{/unless}}
+					{{/each}}
+					</div>
+					{{/unless}}
+				{{/if}}
 				{{#if model.currentCharacter.isThief}}
 					{{#unless model.currentCharacter.robbed }}
 					<p>Choose character to rob</p>
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
 						{{#unless character.isAssasin}}
+						{{#unless character.isWitch}}
 						{{#unless character.isThief}}
 						{{#unless character.isAssasinated}}
+						{{#unless character.isBewitched}}
 							<img {{action "robCharacter" character}} src="characters/{{character.pic}}"/>
+						{{/unless}}
+						{{/unless}}
 						{{/unless}}
 						{{/unless}}
 						{{/unless}}
@@ -118,14 +151,81 @@
 					</div>
 					{{/unless}}
 				{{/if}}
+				{{#if model.currentCharacter.isWizard}}
+					{{#unless model.currentCharacter.stole}}
+						{{#if model.player2.cards.length}}
+						<p>Choose {{model.player2.name}}'s card to steal:</p>
+						<div class="cards-list">
+							{{#each model.player2.cards as |card|}}
+								<img {{action "stealCard" card}} src="districts/{{card.pic}}"/>
+							{{/each}}
+						</div>
+						{{/if}}
+					{{/unless}}
+				{{/if}}
+				{{#if model.currentCharacter.isEmperor}}
+					{{#unless model.player2.on_coronation}}
+					{{#unless model.currentCharacter.coronated}}
+						<button {{action "coronate" model.player2}}>Coronate {{model.player2.name}}</button>
+					{{/unless}}
+					{{/unless}}
+				{{/if}}
+				{{#if model.player1.exploding}}
+					<p>Choose enemy district to explode</p>
+					<div class="cards-list">
+							{{#each model.player2.districts as |district|}}
+								<img {{action "explode" district}} src="districts/{{district.pic}}"/>
+							{{/each}}
+					</div>
+				{{/if}}
+				{{#if model.player1.using_lighthouse}}
+					<p>Choose card to take</p>
+					<div class="lighthouse-cards">
+						{{#each model.deck.content as |card|}}
+							{{#if card.inDeck}}
+							<img {{action "lighthouseTake" card}} src="districts/{{card.pic}}"/>
+							{{/if}}
+						{{/each}}
+					</div>
+				{{/if}}
+				{{/unless}}
 				<div class="actions-block">
 					{{#unless model.currentCharacter.took}}
+					{{#if model.currentCharacter.canTake}}
 						<button {{action 'takeCoins'}}>Take 2 coins</button>
 						<button {{action 'chooseCards'}}>Choose cards</button>
+					{{/if}}
 					{{/unless}}
+					{{#if model.player2.hasBallroom}}
+						{{#if model.player2.has_crown}}
+							{{#unless model.currentCharacter.isBewitched}}
+							{{#unless model.currentCharacter.isAssasinated}}
+							{{#unless model.currentCharacter.thanked}}
+								<button {{action 'thanksYourExcellency'}}>Thanks, your Excellency!</button>
+							{{/unless}}
+							{{/unless}}
+							{{/unless}}
+						{{/if}}
+					{{/if}}
+					{{#unless model.player1Blocked}}
 					{{#if model.player1.hasWorkshop}}
+						{{#unless model.currentCharacter.isWitch}}
 						{{#unless model.currentCharacter.used_workshop}}
 							<button {{action 'useWorkshop'}}>Pay 2 coins for 3 cards</button>
+						{{/unless}}
+						{{/unless}}
+					{{/if}}
+					{{#if model.player1.can_use_belltower}}
+						<button {{action 'ringTheBell'}}>Ring the bell</button>
+					{{/if}}
+					{{#if model.player1.can_use_lighthouse}}
+						{{#unless model.player1.using_lighthouse}}
+							<button {{action 'useLighthouse'}}>Lighthouse</button>
+						{{/unless}}
+					{{/if}}
+					{{#if model.player1.hasArmory}}
+						{{#unless player1.exploding}}
+							<button {{action 'onExplode'}}>Explode armory</button>
 						{{/unless}}
 					{{/if}}
 					{{#if model.currentCharacter.isMagician}}
@@ -133,16 +233,39 @@
 							<div class="magic-buttons"><button {{action 'exchangeCards'}}>Exchange cards</button> or <button {{action 'chooseToDiscard'}}>Discard cards</button></div>
 						{{/unless}}
 					{{/if}}
+					{{#if model.currentCharacter.isNavigator}}
+						{{#unless model.currentCharacter.navigated}}
+							<div class="magic-buttons"><button {{action 'take4Coins'}}>Take 4 coins</button> <button {{action 'take4Cards'}}>Take 4 cards</button></div>
+						{{/unless}}
+					{{/if}}
 					{{#if model.currentCharacter.isColor}}
+					{{#if model.currentCharacter.canTake}}
 						{{#unless model.currentCharacter.took_income}}
 						<button {{action 'takeIncome'}}>Take income</button> 
 						{{/unless}}
+					{{/if}}
 					{{/if}}
 					{{#if model.currentCharacter.isWarlord}}
 						{{#unless model.currentCharacter.destroyed}}
 							<p>Click to enemy district to destroy</p>
 						{{/unless}}
-						{{/if}}
+					{{/if}}
+					{{#if model.currentCharacter.isDiplomat}}
+						{{#unless model.currentCharacter.swapped}}
+							{{#if model.player1.districtOnSwap}}
+								<p>Click to enemy district you want to get</p>
+							{{/if}}
+							{{#if model.player2.districtOnSwap}}
+								<p>Click to your district you want to give</p>
+							{{/if}}
+							{{#unless model.player1.districtOnSwap}}
+								{{#unless model.player2.districtOnSwap}}
+									<p>Click to your or enemy district you want to swap</p>
+								{{/unless}}
+							{{/unless}}
+						{{/unless}}
+					{{/if}}
+					{{/unless}}
 					{{#if model.currentCharacter.took}}
 						{{#unless model.deck.cards_on_choose}}
 							{{#if model.currentCharacter.can_build}}
@@ -178,6 +301,14 @@
 				{{/if}}
 			{{/if}}
 		{{/if}}
+		{{#if model.player1.on_coronation}}
+		{{#unless model.phazeIsEnd}}
+			<div class="magic-buttons">
+				<button {{action 'giveCoinForCrown' model.player1}}>Give coin for crown</button>
+				<button {{action 'giveCardForCrown' model.player1}}>Give card for crown</button>
+			</div>
+		{{/unless}}
+		{{/if}}
 		<div class="districts-block">
 				<p>Your cards:</p>
 			{{#if model.youActivePlayer }}	
@@ -197,14 +328,33 @@
 							{{#if model.youActivePlayer}}
 								{{#if model.phazeIsAction }}
 									{{#if model.player1.hasLab }}
+										{{#unless model.player1Blocked}}
+										{{#unless model.currentCharacter.isWitch}}
 										{{#unless model.currentCharacter.used_lab}}
 											<button {{action 'toLab' card}}>Lab</button>
+										{{/unless}}
+										{{/unless}}
+										{{/unless}}
+									{{/if}}
+									{{#if model.player1.hasMuseum }}
+										{{#unless model.player1Blocked}}
+										{{#unless model.currentCharacter.isWitch}}
+										{{#unless model.currentCharacter.used_museum}}
+											<button {{action 'toMuseum' card}}>Museum</button>
+										{{/unless}}
+										{{/unless}}
 										{{/unless}}
 									{{/if}}
 								{{/if}}
 							{{/if}}
-						{{/unless}} 
-						<img {{action 'build' card}} src="districts/{{card.pic}}"/>
+						{{/unless}}
+						{{#if card.onWizard}}
+							<div class="character-notes">wizard</div>
+							<img {{action 'wizardBuild' card}} src="districts/{{card.pic}}"/>
+						{{/if}}
+						{{#unless card.onWizard}} 
+							<img {{action 'build' card}} src="districts/{{card.pic}}"/>
+						{{/unless}}
 					</div>
 				{{/each}}
 			</div>
@@ -222,7 +372,7 @@
 						{{#if model.player1.has_crown}}<img src="crown.png"/>{{/if}}
 					</div>
 				</div>
-				<div class="cards-list">
+				<div class="characters-list">
 					{{#each model.player1.characters as |character|}}
 							<div class="character-block">
 								<div class="character-notes">
@@ -231,6 +381,9 @@
 									{{/if}}
 									{{#if character.isRobbed }}
 										robbed
+									{{/if}}
+									{{#if character.isBewitched }}
+										bewitched
 									{{/if}}
 								</div>
 								<img src="characters/{{character.pic}}"/>
@@ -251,7 +404,7 @@
 			<div class="districts">
 				<div class="cards-list districts-list">
 					{{#each model.player1.districts as |district|}}
-						<img {{action "destroy" district}} src="districts/{{district.pic}}"/>
+						<img {{action "destroyOrSwap" district}} src="districts/{{district.pic}}"/>
 					{{/each}}
 				</div>
 				<div class="score">Score: {{model.player1.score}}</div>
@@ -265,7 +418,7 @@
 						{{#if model.player2.has_crown}}<img src="crown.png"/>{{/if}}
 					</div>
 				</div>
-				<div class="cards-list">
+				<div class="characters-list">
 					{{#each model.player2.characters as |character|}}
 							<div class="character-block">
 								<div class="character-notes">
@@ -274,6 +427,9 @@
 									{{/if}}
 									{{#if character.isRobbed }}
 										robbed
+									{{/if}}
+									{{#if character.isBewitched }}
+										bewitched
 									{{/if}}
 								</div>
 								<img src="characters/{{character.pic}}"/>
@@ -294,7 +450,7 @@
 			<div class="districts">
 				<div class="cards-list districts-list">
 					{{#each model.player2.districts as |district|}}
-						<img {{action "destroy" district}} src="districts/{{district.pic}}"/>
+						<img {{action "destroyOrSwap" district}} src="districts/{{district.pic}}"/>
 					{{/each}}
 				</div>
 				<div class="score">Score: {{model.player2.score}}</div>
@@ -310,6 +466,14 @@
 						<button {{action 'noGraveyard'}}>No</button>
 					{{/if}}
 				{{/if}}
+			{{/if}}
+			{{#if model.player2.on_coronation}}
+			{{#unless model.phazeIsEnd}}
+			<div class="magic-buttons">
+				<button {{action 'giveCoinForCrown' model.player2}}>Give coin for crown</button>
+				<button {{action 'giveCardForCrown' model.player2}}>Give card for crown</button>
+			</div>
+			{{/unless}}
 			{{/if}}
 				<p>Robot cards:</p>
 				{{#if model.robotActivePlayer}}
@@ -329,14 +493,33 @@
 							{{#if model.robotActivePlayer}}
 								{{#if model.phazeIsAction }}
 									{{#if model.player2.hasLab }}
+									{{#unless model.player2Blocked}}
+									{{#unless model.currentCharacter.isWitch}}
 										{{#unless model.currentCharacter.used_lab}}
 											<button {{action 'toLab' card}}>Lab</button>
+										{{/unless}}
+									{{/unless}}
+									{{/unless}}
+									{{/if}}
+									{{#if model.player2.hasMuseum }}
+										{{#unless model.player2Blocked}}
+										{{#unless model.currentCharacter.isWitch}}
+										{{#unless model.currentCharacter.used_museum}}
+											<button {{action 'toMuseum' card}}>Museum</button>
+										{{/unless}}
+										{{/unless}}
 										{{/unless}}
 									{{/if}}
 								{{/if}}
 							{{/if}}
 						{{/unless}} 
-						<img {{action 'build' card}} src="districts/{{card.pic}}"/>
+						{{#if card.onWizard}}
+							<div class="character-notes">wizard</div>
+							<img {{action 'wizardBuild' card}} src="districts/{{card.pic}}"/>
+						{{/if}}
+						{{#unless card.onWizard}} 
+							<img {{action 'build' card}} src="districts/{{card.pic}}"/>
+						{{/unless}}
 					</div>
 				{{/each}}
 			</div>
@@ -372,6 +555,7 @@
 				</div>
 			{{/if}}
 			{{#if model.phazeIsAction }}
+				{{#unless model.player2Blocked}}
 				{{#if model.currentCharacter.isAssasin}}
 					{{#unless model.currentCharacter.assasinated }}
 					<p>Choose character to assasinate</p>
@@ -384,15 +568,31 @@
 					</div>
 					{{/unless}}
 				{{/if}}
+				{{#if model.currentCharacter.isWitch}}
+					{{#unless model.currentCharacter.bewitched }}
+					<p>Choose character to bewitch</p>
+					<div class="cards-list">
+					{{#each model.characters.content as |character|}}
+						{{#unless character.isWitch}}
+							<img {{action "bewitchCharacter" character}} src="characters/{{character.pic}}"/>
+						{{/unless}}
+					{{/each}}
+					</div>
+					{{/unless}}
+				{{/if}}
 				{{#if model.currentCharacter.isThief}}
 					{{#unless model.currentCharacter.robbed }}
 					<p>Choose character to rob</p>
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
 						{{#unless character.isAssasin}}
-						{{#unless character.isAssasinated}}
+						{{#unless character.isWitch}}
 						{{#unless character.isThief}}
+						{{#unless character.isAssasinated}}
+						{{#unless character.isBewitched}}
 							<img {{action "robCharacter" character}} src="characters/{{character.pic}}"/>
+						{{/unless}}
+						{{/unless}}
 						{{/unless}}
 						{{/unless}}
 						{{/unless}}
@@ -400,14 +600,81 @@
 					</div>
 					{{/unless}}
 				{{/if}}
+				{{#if model.currentCharacter.isWizard}}
+					{{#unless model.currentCharacter.stole}}
+						{{#if model.player1.cards.length}}
+						<p>Choose {{model.player1.name}}'s card to steal:</p>
+						<div class="cards-list">
+							{{#each model.player1.cards as |card|}}
+								<img {{action "stealCard" card}} src="districts/{{card.pic}}"/>
+							{{/each}}
+						</div>
+						{{/if}}
+					{{/unless}}
+				{{/if}}
+				{{#if model.currentCharacter.isEmperor}}
+					{{#unless model.player1.on_coronation}}
+					{{#unless model.currentCharacter.coronated}}
+						<button {{action "coronate" model.player1}}>Coronate {{model.player1.name}}</button>
+					{{/unless}}
+					{{/unless}}
+				{{/if}}
+				{{#if model.player2.exploding}}
+					<p>Choose enemy district to explode</p>
+					<div class="cards-list">
+							{{#each model.player1.districts as |district|}}
+								<img {{action "explode" district}} src="districts/{{district.pic}}"/>
+							{{/each}}
+					</div>
+				{{/if}}
+				{{#if model.player2.using_lighthouse}}
+					<p>Choose card to take</p>
+					<div class="lighthouse-cards">
+						{{#each model.deck.content as |card|}}
+							{{#if card.inDeck}}
+							<img {{action "lighthouseTake" card}} src="districts/{{card.pic}}"/>
+							{{/if}}
+						{{/each}}
+					</div>
+				{{/if}}
+				{{/unless}}
 				<div class="actions-block">
 					{{#unless model.currentCharacter.took}}
+					{{#if model.currentCharacter.canTake}}
 						<button {{action 'takeCoins'}}>Take 2 coins</button>
 						<button {{action 'chooseCards'}}>Choose cards</button>
+					{{/if}}
+					{{#if model.player1.hasBallroom}}
+						{{#if model.player1.has_crown}}
+							{{#unless model.currentCharacter.isBewitched}}
+							{{#unless model.currentCharacter.isAssasinated}}
+							{{#unless model.currentCharacter.thanked}}
+								<button {{action 'thanksYourExcellency'}}>Thanks, your Excellency!</button>
+							{{/unless}}
+							{{/unless}}
+							{{/unless}}
+						{{/if}}
+					{{/if}}
 					{{/unless}}
+					{{#unless model.player2Blocked}}
 					{{#if model.player2.hasWorkshop}}
+						{{#unless model.currentCharacter.isWitch}}
 						{{#unless model.currentCharacter.used_workshop}}
 							<button {{action 'useWorkshop'}}>Pay 2 coins for 3 cards</button>
+						{{/unless}}
+						{{/unless}}
+					{{/if}}
+					{{#if model.player2.can_use_belltower}}
+						<button {{action 'ringTheBell'}}>Ring the bell</button>
+					{{/if}}
+					{{#if model.player2.can_use_lighthouse}}
+						{{#unless model.player2.using_lighthouse}}
+							<button {{action 'useLighthouse'}}>Lighthouse</button>
+						{{/unless}}
+					{{/if}}
+					{{#if model.player2.hasArmory}}
+						{{#unless player2.exploding}}
+							<button {{action 'onExplode'}}>Explode armory</button>
 						{{/unless}}
 					{{/if}}
 					{{#if model.currentCharacter.isMagician}}
@@ -415,16 +682,39 @@
 						<div class="magic-buttons"><button {{action 'exchangeCards'}}>Exchange cards</button> or <button {{action 'chooseToDiscard'}}>Discard cards</button></div>
 						{{/unless}}
 					{{/if}}
+					{{#if model.currentCharacter.isNavigator}}
+						{{#unless model.currentCharacter.navigated}}
+							<div class="magic-buttons"><button {{action 'take4Coins'}}>Take 4 coins</button> <button {{action 'take4Cards'}}>Take 4 cards</button></div>
+						{{/unless}}
+					{{/if}}
 					{{#if model.currentCharacter.isColor}}
+					{{#if model.currentCharacter.canTake}}
 						{{#unless model.currentCharacter.took_income}}
 						<button {{action 'takeIncome'}}>Take income</button> 
 						{{/unless}}
+					{{/if}}
 					{{/if}}
 					{{#if model.currentCharacter.isWarlord}}
 							{{#unless model.currentCharacter.destroyed}}
 								<p>Click to enemy district to destroy</p>
 							{{/unless}}
 					{{/if}}
+					{{#if model.currentCharacter.isDiplomat}}
+						{{#unless model.currentCharacter.swapped}}
+							{{#if model.player2.districtOnSwap}}
+								<p>Click to enemy district you want to get</p>
+							{{/if}}
+							{{#if model.player1.districtOnSwap}}
+								<p>Click to your district you want to give</p>
+							{{/if}}
+							{{#unless model.player1.districtOnSwap}}
+								{{#unless model.player2.districtOnSwap}}
+									<p>Click to your or enemy district you want to swap</p>
+								{{/unless}}
+							{{/unless}}
+						{{/unless}}
+					{{/if}}
+					{{/unless}}
 					{{#if model.currentCharacter.took}}
 						{{#unless model.deck.cards_on_choose}}
 							{{#if model.currentCharacter.can_build}}

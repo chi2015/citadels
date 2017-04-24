@@ -94,7 +94,6 @@ p {
 }
 
 .cards-list, .characters-list {
-	height: 140px;
 	display: flex;
 	flex-direction: row;
 	justify-content: flex-start;
@@ -102,14 +101,30 @@ p {
 	margin: auto 0;
 }
 
+.characters-list {
+	height: 140px;
+}
+
 .cards-list {
 
 }
 
-.cards-list img {
+.cards-list img, .characters-list img {
 	margin: 5px;
 	
 }
+
+.lighthouse-cards {
+	display: flex;
+	justify-content: flex-start;
+	flex-direction: row;
+	flex-wrap: wrap;
+	width: 900px;
+}
+
+.lighthouse-cards img {
+	margin: 5px;
+}	
 
 .board {
 	display: flex;
@@ -139,7 +154,7 @@ p {
 }
 
 .profile-head {
-	height: 35px;
+	height: 33px;
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-start;
@@ -150,7 +165,7 @@ p {
 }
 
 .profile-crown img {
-	height: 35px;
+	height: 33px;
 }
 
 .resources {
@@ -175,7 +190,7 @@ p {
 }
 
 .resource-pic img {
-	height: 35px;
+	height: 33px;
 }
 
 .resource-count {
@@ -240,7 +255,11 @@ p {
 	margin: 3px 0;
 }
 
-.districts-list {
-	margin-top: 43px;
+.board-1 .districts-list {
+	margin-top: 47px;
+}
+
+.board-2 .districts-list {
+	margin-top: 47px;
 }
 
