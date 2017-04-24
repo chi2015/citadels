@@ -8,7 +8,45 @@
 <body>  
   <script type="text/x-handlebars" data-template-name="index">
 	<div class="main-block">
+		{{#if model.phazeIsStart}}
+			<div class="start-block">
+				<div class="start-subblock">
+					<div class="start-head-block">
+						<h2>2 players: You vs Robot</h2>
+					</div>
+					<div class="input-block">
+						<label>Game name:</label>
+						{{input type="text" value=gameName}}
+					</div>
+					<div class="input-block">
+						<label>Your name:</label>
+						{{input type="text" value=yourName}}
+					</div>
+					<div class="input-block">
+						<label>Robot name:</label>
+						{{input type="text" value=robotName}}
+					</div>
+					<div class="game-type-block">
+						<p>Game type:</p>
+						<div class="input-radio-block">
+							<input type="radio" value="classic" name="game_type" checked="checked"/>
+							<label>Classic</label>
+						</div>
+						<div class="input-radio-block">
+							<input type="radio" value="extended" name="game_type" disabled="disabled"/>
+							<label>Extended</label>
+						</div>
+					</div>
+					
+					<div class="start-button-block">
+						<button {{action 'start' gameName yourName robotName}}>Start</button>
+					</div>
+				</div>
+			</div>
+		{{/if}}
+		{{#unless model.phazeIsStart}}
 		<div class="head-block">
+			<div class="title-block">
 			<h1>Game: {{model.name}}</h1>
 			{{#unless model.phazeIsEnd }}
 			<h2>Phaze: {{model.phaze}}. 
@@ -20,6 +58,11 @@
 			{{#if model.phazeIsEnd }}
 			<h2>Game finished! The winner is {{model.winner}}</h2>
 			{{/if}}
+			</div>
+			{{#unless model.phazeIsEnd}}
+				<button class="finish"{{action "finish"}}>Finish game</button>
+			{{/unless}}
+			{{#if model.phazeIsEnd}}<button class="restart"{{action "restart"}}>Start new game</button>{{/if}}
 		</div>
 		{{#if model.youActivePlayer}}
 			{{#if model.phazeIsChoose }}
@@ -408,6 +451,7 @@
 					{{/if}}
 			{{/if}}
 		{{/if}}
+		{{/unless}}
 	</div>
   </script>
 
