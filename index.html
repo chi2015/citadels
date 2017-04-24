@@ -126,6 +126,7 @@
 			{{/unless}}
 			{{#if model.phazeIsEnd}}<button class="restart"{{action "restart" model}}>Start new game</button>{{/if}}
 		</div>
+		{{#unless model.hidePlayer1Cards}}
 		{{#if model.youActivePlayer}}
 			{{#if model.phazeIsChoose }}
 				<div class="phaze-block">
@@ -432,6 +433,7 @@
 				{{/if}}
 			{{/if}}
 		</div>
+		{{/unless}}
 		<div class="board board-1">
 			<div class="profile">
 				<div class="profile-head">
@@ -443,24 +445,50 @@
 				<div class="characters-list">
 					{{#each model.player1.characters as |character|}}
 							<div class="character-block tooltip">
-								<div class="character-notes">
-									{{#if character.isAssassinated }}
-										assassinated
+								{{#if model.hidePlayer1Cards}}
+									{{#if character.revealed}}
+										<div class="character-notes">
+											{{#if character.isAssassinated }}
+												assassinated
+											{{/if}}
+											{{#if character.isRobbed }}
+												robbed
+											{{/if}}
+											{{#if character.isBewitched }}
+												bewitched
+											{{/if}}
+										</div>
+										{{#if character.is_current}}
+											<img src="characters/{{character.pic}}" class="current"/>
+										{{/if}}
+										{{#unless character.is_current}}
+											<img src="characters/{{character.pic}}"/>
+										{{/unless}}
+										<span class="tooltiptext">{{character.desc}}</span>
+									{{else}}
+										<div class="character-notes"></div>
+										<img src="faceup.jpg"/>
 									{{/if}}
-									{{#if character.isRobbed }}
-										robbed
+								{{else}}
+									<div class="character-notes">
+										{{#if character.isAssassinated }}
+											assassinated
+										{{/if}}
+										{{#if character.isRobbed }}
+											robbed
+										{{/if}}
+										{{#if character.isBewitched }}
+											bewitched
+										{{/if}}
+									</div>
+									{{#if character.is_current}}
+										<img src="characters/{{character.pic}}" class="current"/>
 									{{/if}}
-									{{#if character.isBewitched }}
-										bewitched
-									{{/if}}
-								</div>
-								{{#if character.is_current}}
-									<img src="characters/{{character.pic}}" class="current"/>
+									{{#unless character.is_current}}
+										<img src="characters/{{character.pic}}"/>
+									{{/unless}}
+									<span class="tooltiptext">{{character.desc}}</span>
 								{{/if}}
-								{{#unless character.is_current}}
-									<img src="characters/{{character.pic}}"/>
-								{{/unless}}
-								<span class="tooltiptext">{{character.desc}}</span>
 							</div>
 					{{/each}}
 				</div>
@@ -527,7 +555,7 @@
 				<div class="characters-list">
 					{{#each model.player2.characters as |character|}}
 							<div class="character-block tooltip">
-								{{#if model.hideRobotCards}}
+								{{#if model.hidePlayer2Cards}}
 									{{#if character.revealed}}
 										<div class="character-notes">
 											{{#if character.isAssassinated }}
@@ -626,7 +654,7 @@
 				</div>
 			</div>
 		</div>
-		{{#unless model.hideRobotCards}}
+		{{#unless model.hidePlayer2Cards}}
 		<div class="districts-block">
 			{{#if model.player2.hasGraveyard}}
 				{{#if model.deck.card_on_graveyard}}

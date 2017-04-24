@@ -1,7 +1,7 @@
 App.Game = Ember.Object.extend({
 	
 	name: "new game",
-	version: "1.0.1",
+	version: "1.0.2",
 	player1 : null,
 	player2: null,
 	player1_strategy: null,
@@ -29,15 +29,31 @@ App.Game = Ember.Object.extend({
 		this.set('activePlayer', Math.random() < 0.5 ? this.get('player1') : this.get('player2'));
 	},
 	setStrategy : function() {
-		if (!player2_strategy) player2_strategy = App.Strategy.create({game: this, player: this.get('player2')});
-		else 
+		if (this.get('player2').get('is_robot'))
 		{
-			player2_strategy.set('player', this.get('player2'));
-			player2_strategy.set('enemy', this.get('player1'));
-			player2_strategy.addObserversPlayers();
-			player2_strategy.resetTimer();
+			if (!player2_strategy) player2_strategy = App.Strategy.create({game: this, player: this.get('player2')});
+			else 
+			{
+				player2_strategy.set('player', this.get('player2'));
+				player2_strategy.set('enemy', this.get('player1'));
+				player2_strategy.addObserversPlayers();
+				player2_strategy.resetTimer();
+			}
+			this.set('player2_strategy', player2_strategy);
 		}
-		this.set('player2_strategy', player2_strategy);	
+		
+		if (this.get('player1').get('is_robot'))
+		{
+			if (!player1_strategy) player1_strategy = App.Strategy.create({game: this, player: this.get('player1')});
+			else 
+			{
+				player1_strategy.set('player', this.get('player1'));
+				player1_strategy.set('enemy', this.get('player2'));
+				player1_strategy.addObserversPlayers();
+				player1_strategy.resetTimer();
+			}
+			this.set('player1_strategy', player1_strategy);
+		}	
 	},
 	setCrownTo : function(player) {
 		var old_crown_owner = this.get('player1').get('has_crown') ? this.get('player1') : this.get('player2');
@@ -217,8 +233,11 @@ App.Game = Ember.Object.extend({
 	robotActivePlayer : function() {
   		return this.get('activePlayer') === this.get('player2');
 	}.property('activePlayer'),
-	hideRobotCards : Ember.computed('automatic', 'hide_robot_cards', function() {
-		return this.get('automatic') && this.get('hide_robot_cards');
+	hidePlayer1Cards : Ember.computed('automatic', 'hide_robot_cards', function() {
+		return this.get('automatic') && this.get('hide_robot_cards') && this.get('player1').get('is_robot');
+	}),
+	hidePlayer2Cards : Ember.computed('automatic', 'hide_robot_cards', function() {
+		return this.get('automatic') && this.get('hide_robot_cards') && this.get('player2').get('is_robot');
 	}),
 	player1Blocked : Ember.computed('activePlayer', 'player1', 'player2', 'currentCharacter', 'currentCharacter.thanked', function() {
 		return (this.get('currentCharacter').get('state') == 'bewitched' && this.get('currentCharacter').get('player') === this.get('player1')

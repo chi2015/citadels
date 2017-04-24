@@ -103,6 +103,7 @@ App.Strategy = Ember.Object.extend({
 		        && !this.get('player').get('closed') && characters.findBy('name', 'Warlord') && (in_round || (!in_round && this.isPossibleEnemyCharacter(8))))
 			danger_characters = this.pushCharacter(danger_characters, characters.findBy('name', 'Warlord'));
 		if (this.get('enemy').get('cards').length < 3 && 
+		    this.get('player').get('cards').length > 1 &&
 		    this.get('player').get('cards').length > this.get('enemy').get('cards').length
 		    && characters.findBy('name', 'Magician') && (in_round || (!in_round && this.isPossibleEnemyCharacter(3))))
 			danger_characters = this.pushCharacter(danger_characters, characters.findBy('name', 'Magician'));
@@ -130,7 +131,7 @@ App.Strategy = Ember.Object.extend({
 		if (characters.findBy('name', 'Navigator') && (this.get('enemy').hasDistrict('treasury') || this.get('enemy').hasDistrict('maproom'))
 		         && this.isPossibleEnemyCharacter(7))
 			danger_characters = this.pushCharacter(danger_characters, characters.findBy('name', 'Navigator'));
-		if (in_round && this.get('enemy').get('coins') > 3 && characters.findBy('name', 'Thief'))
+		if (in_round && this.get('enemy').get('coins') > 2 && characters.findBy('name', 'Thief'))
 			danger_characters = this.pushCharacter(danger_characters, characters.findBy('name', 'Thief'));
 		if (in_round && this.get('enemy').get('cards').length > this.get('player').get('cards').length + 2 && characters.findBy('name', 'Magician'))
 			danger_characters = this.pushCharacter(danger_characters, characters.findBy('name', 'Magician'));
@@ -154,7 +155,9 @@ App.Strategy = Ember.Object.extend({
 	dangerCharacter : function() {
 		var danger_characters = this.dangerCharacters();
 		var danger_chance = this.get('game').get('characters').get('content').findBy('name', 'Witch') &&
-		this.isPossibleEnemyCharacter(1) ? 0.35 : 0.5;
+		this.isPossibleEnemyCharacter(1) && danger_characters.length && danger_characters.objectAt(0).get('name') != 'King' ? 0.35 : 
+		(!danger_characters.findBy('name', 'King') && danger_characters.length && danger_characters.objectAt(0).get('name') == 'Warlord' && 
+		 this.get('game').get('characters').get('content').filterBy('status', 'in_round').filterBy('name','Bishop').length ? 0.4 : 0.5);
 		if (this.get('game').get('phaze') == 'choose') {
 			var king = danger_characters.findBy('name', 'King') && Math.random() < this.kingChance();
 			switch (danger_characters.length) {
@@ -189,7 +192,8 @@ App.Strategy = Ember.Object.extend({
 			useful_character = characters.findBy('name', 'Magician');
 		else if (this.get('player').get('coins') > 3 && characters.findBy('name', 'Architect'))
 			useful_character = characters.findBy('name', 'Architect');
-		else if (this.get('player').get('coins') > 2 && this.get('player').get('cards').length && !this.hasAllDublicates() && characters.findBy('name', 'Alchemist'))
+		else if (this.get('player').get('coins') > 2 && this.get('player').get('cards').length && !this.hasAllDublicates() && characters.findBy('name', 'Alchemist')
+		&& !this.endOfGame())
 			useful_character = characters.findBy('name', 'Alchemist');
 		else if (this.get('player').get('coins') > 3 && characters.findBy('name', 'Wizard') && this.get('enemy').get('cards').length > 1 && this.get('player').get('cards').length > 1)
 			useful_character = characters.findBy('name', 'Wizard');
@@ -286,11 +290,10 @@ App.Strategy = Ember.Object.extend({
 			return false;
 		}
 		
+		if (this.get('game').get('first_full_city') && this.get('player').hasDistrict('treasury'))
+			return false;
 		if (this.get('game').get('first_full_city') && this.get('player').hasDistrict('maproom'))
 			return true;
-		
-		if (this.get('game').get('first_full_city') && this.get('player').hasDistrict('treasury'))
-			return false; 
 		
 		if (this.get('game').get('currentCharacter').get('name') == 'Magician' && 
 		    (this.get('enemy').get('cards').length || this.hasAllDublicates()) &&
@@ -318,13 +321,24 @@ App.Strategy = Ember.Object.extend({
 		    {
 				return false;
 			}
+			
+	    if (this.get('game').get('characters').get('content').findBy('name', 'Magician') &&
+	        this.get('game').get('currentCharacter').get('number') < 3 && 
+	        (!this.get('player').get('cards').length || this.hasAllDublicates()) &&
+	        this.get('player').get('coins') < 2 && this.isPossibleEnemyCharacter(3))
+	        {
+				return false;
+			}
 		    
 		if (!this.get('player').get('cards').length || this.hasAllDublicates())
 		{
 			return true;
 		}
 		
-		if (this.endOfGame() && this.get('game').get('currentCharacter').get('name') !== 'Navigator' && (function(that) {
+		if (this.endOfGame() && 
+		    (this.get('player').get('characters').sortBy('number').objectAt(1) === this.get('game').get('currentCharacter') ||
+		    ['assassinated','bewitched'].indexOf(this.get('player').get('characters').sortBy('number').objectAt(1).get('state')) > -1) &&
+		    this.get('game').get('currentCharacter').get('name') !== 'Navigator' && (function(that) {
 		     	var ret = true;
 		     	that.get('player').get('cards').forEach(function(card) {
 		     		if (that.enoughCoinsToBuild(card)) ret = false;
@@ -554,7 +568,10 @@ App.Strategy = Ember.Object.extend({
 		
 		if (this.get('player').hasDistrict('belltower') &&
 		    this.get('player').get('districts').length >
-		    this.get('enemy').get('districts').length + this.get('enemy').get('has_crown'))
+		    this.get('enemy').get('districts').length + this.get('enemy').get('has_crown')
+		    && (this.get('enemy').get('characters').sortBy('number').objectAt(1).get('revealed')
+		    || this.get('enemy').get('districts').length < this.get('enemy').get('districts_to_close') - 2
+		    ))
 		    this.get('player').ringTheBell(this.get('game'));
 		
 		if (!this.get('enemy').get('on_graveyard'))

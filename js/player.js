@@ -142,8 +142,13 @@ App.Player = Ember.Object.extend({
 				if (district_owner.get('districts').length < district_owner.get('districts_to_close'))
 				{
 					district_owner.set('closed_first', false);
-					game.set('first_full_city', false);
+					if (this.get('districts').length < this.get('districts_to_close')) 
+					{
+						this.set('closed_first', false);
+						game.set('first_full_city', false);
+					}
 				}
+				
 			}
 			
 			district.set('player', false);
