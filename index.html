@@ -96,7 +96,7 @@
 						{{/unless}}
 						{{/if}}
 					{{#if model.currentCharacter.took}}
-						{{#unless model.player1.cards_on_choose}}
+						{{#unless model.deck.cards_on_choose}}
 							{{#if model.currentCharacter.can_build}}
 								<p>Click to one of your cards to build</p>
 							{{/if}}
@@ -104,12 +104,12 @@
 						{{/unless}}
 					{{/if}}
 				</div>
-					{{#if model.player1.cards_on_choose }}
+					{{#if model.deck.cards_on_choose }}
 					<p>Choose card to take:</p>
 					<div class="cards-list">
-						{{#each model.deck.content as |card index|}}
+						{{#each model.deck.content as |card|}}
 							{{#if card.onChoose }}
-								<img {{action "takeCard" index}} src="districts/{{card.pic}}"/>
+								<img {{action "takeCard" card}} src="districts/{{card.pic}}"/>
 							{{/if}}
 						{{/each}}
 					</div>
@@ -119,10 +119,8 @@
 		<div class="districts-block">
 			<p>Your cards:</p>
 			<div class="cards-list">
-				{{#each model.deck.content as |card index|}}
-						{{#if card.inMyHand }}
-							<img {{action 'build' index}} src="districts/{{card.pic}}"/>
-						{{/if}}
+				{{#each model.player1.cards as |card|}}
+					<img {{action 'build' card}} src="districts/{{card.pic}}"/>
 				{{/each}}
 			</div>
 		</div>
@@ -135,8 +133,7 @@
 					</div>
 				</div>
 				<div class="cards-list">
-					{{#each model.characters.content as |character|}}
-						{{#if character.inMyHand }}
+					{{#each model.player1.characters as |character|}}
 							<div class="character-block">
 								<div class="character-notes">
 									{{#if character.isAssasinated }}
@@ -148,7 +145,6 @@
 								</div>
 								<img src="characters/{{character.pic}}"/>
 							</div>
-						{{/if}}
 					{{/each}}
 				</div>
 				<div class="resources">
@@ -158,7 +154,7 @@
 					</div>
 					<div class="rs-block">
 						<div class="resource-pic"><img src="card.png"/></div>
-						<div class="resource-count">{{model.player1.cards_count}}</div>
+						<div class="resource-count">{{model.player1.cards.length}}</div>
 					</div>
 				</div>
 			</div>
@@ -180,8 +176,7 @@
 					</div>
 				</div>
 				<div class="cards-list">
-					{{#each model.characters.content as |character|}}
-						{{#if character.inRobotHand }}
+					{{#each model.player2.characters as |character|}}
 							<div class="character-block">
 								<div class="character-notes">
 									{{#if character.isAssasinated }}
@@ -193,7 +188,6 @@
 								</div>
 								<img src="characters/{{character.pic}}"/>
 							</div>
-						{{/if}}
 					{{/each}}
 				</div>
 				<div class="resources">
@@ -203,7 +197,7 @@
 					</div>
 					<div class="rs-block">
 						<div class="resource-pic"><img src="card.png"/></div>
-						<div class="resource-count">{{model.player2.cards_count}}</div>
+						<div class="resource-count">{{model.player2.cards.length}}</div>
 					</div>
 				</div>
 			</div>
@@ -219,10 +213,8 @@
 		<div class="districts-block">
 			<p>Robot cards:</p>
 			<div class="cards-list">
-				{{#each model.deck.content as |card index|}}
-						{{#if card.inRobotHand }}
-							<img {{action 'build' index}} src="districts/{{card.pic}}"/>
-						{{/if}}
+				{{#each model.player2.cards as |card|}}
+					<img {{action 'build' card}} src="districts/{{card.pic}}"/>
 				{{/each}}
 			</div>
 		</div>
@@ -301,7 +293,7 @@
 							{{/unless}}
 					{{/if}}
 					{{#if model.currentCharacter.took}}
-						{{#unless model.player2.cards_on_choose}}
+						{{#unless model.deck.cards_on_choose}}
 							{{#if model.currentCharacter.can_build}}
 								<p>Click to one of your cards to build</p>
 							{{/if}}
@@ -310,12 +302,12 @@
 					{{/if}}
 				</div>
 				
-					{{#if model.player2.cards_on_choose }}
+					{{#if model.deck.cards_on_choose }}
 						<p>Choose card to take:</p>
 						<div class="cards-list">
-							{{#each model.deck.content as |card index|}}
+							{{#each model.deck.content as |card|}}
 								{{#if card.onChoose }}
-									<img {{action "takeCard" index}} src="districts/{{card.pic}}"/>
+									<img {{action "takeCard" card}} src="districts/{{card.pic}}"/>
 								{{/if}}
 							{{/each}}
 						</div>
