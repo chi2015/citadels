@@ -1,7 +1,8 @@
 App.Character = Ember.Object.extend({
 	player : false,
 	handle_player: false,
-	took : false,
+	took : 0,
+	taking : false,
 	built : 0,
     max_build : 1,
     can_build : function() {
@@ -11,11 +12,14 @@ App.Character = Ember.Object.extend({
 	used_lab : false,
 	used_museum : false,
 	thanked : false,
+	is_current : false,
 	status : 'in_round', //in_round, in_hand, discarded
     pic : "",
-	state : 'normal', //assasinated, robbed, bewitched
+	state : 'normal', //assassinated, robbed, bewitched
+	revealed: false,
 	reveal : function(game) {
-	   if (this.get('state') == 'assasinated' || this.get('status') == 'discarded') 
+	   this.set('revealed', true);
+	   if (this.get('state') == 'assassinated' || this.get('status') == 'discarded') 
 	   		if (!this.get('player') || !this.get('player').hasDistrict('hospital'))
 		    {
 		   		this.endTurn(game);
@@ -32,18 +36,21 @@ App.Character = Ember.Object.extend({
 	   
 	   this.set('handle_player', this.get('player'));
 	   game.set('activePlayer', this.get('handle_player'));
+	   this.set('is_current', true);
 	},
 	canTake : true,
 	takeCoins : function(game) {
-		if (this.get('took')) return;
+		if (this.get('took') || this.get('taking')) return;
+		this.set('taking', true);
 		this.get('handle_player').set('coins', this.get('handle_player').get('coins') + 2);
-		this.set('took', true);
-		this.checkAssasinated(game);
+		this.set('took', 1 + this.get('handle_player').hasDistrict('library'));
+		this.checkAssassinated(game);
 		this.checkBewitched(game);
 		this.checkThanked(game);
 	},
 	chooseCard : function(game) {
-		if (this.get('took')) return;
+		if (this.get('took') || this.get('taking')) return;
+		this.set('taking', true);
 		var n, chosen;
 		var deck_content = game.get('deck').get('content');
 		var deck_length = deck_content.length;
@@ -61,45 +68,47 @@ App.Character = Ember.Object.extend({
 				{
 					card.set('status', 'on_choice');
 					card.set('player', this.get('handle_player'));
-					if (this.get('handle_player').hasDistrict('library')) this.takeCard(game, card);
 					chosen = true;
 				}
 			}
 		}
-		this.set('took', true);
 		
-		if (this.get('handle_player').hasDistrict('library')) {
-			this.checkAssasinated(game);
-			this.checkBewitched(game);
-			this.checkThanked(game);
-		}	
-		
+		if (1 + this.get('handle_player').hasDistrict('library') == cards_to_choose)
+		{
+			var cards_on_choice = deck_content.filterBy('status', 'on_choice');
+			for (var k=0; k<cards_on_choice.length; k++)
+				this.takeCard(game, cards_on_choice.objectAt(k));
+		} 
+			
 	},
 	takeCard : function(game, card)
-	{
-		if (card.get('status') == 'on_choice' && card.get('player') === this.get('handle_player'))
+	{		
+		if (card && card.get('status') == 'on_choice' && card.get('player') === this.get('handle_player'))
+		{
 			card.set('status','in_hand');
-			
-		game.get('deck').get('content').filterBy('status','on_choice').forEach(function(card) {
-			card.set('status','in_deck');
-			card.set('player',false);
-		});
-		this.get('handle_player').get('cards').pushObject(card);
+			this.get('handle_player').get('cards').pushObject(card);
+		}
 		
-		if (!this.get('handle_player').hasDistrict('library')) {
-			this.checkAssasinated(game);
+		this.set('took', this.get('took') + 1);
+				
+		if (this.get('took') == 1 + this.get('handle_player').hasDistrict('library')) {
+			
+			game.get('deck').get('content').filterBy('status','on_choice').forEach(function(card) {
+					card.set('status','in_deck');
+					card.set('player',false);
+				});
+			this.checkAssassinated(game);
 			this.checkBewitched(game);
 			this.checkThanked(game);
 		}		
 	},
 	build : function(game, card) {
 		if (this.get('built') == this.get('max_build')) return;
-		if (!this.get('took')) return;
+		if (!this.get('took') || game.get('deck').get('cards_on_choose')) return;
 		if (card.get('status') != 'in_hand') return;
 		if (card.get('player')!== this.get('handle_player')) return;
 		
-		var build_cost = card.get('cost') - (this.get('handle_player').hasDistrict('factory') &&
-		(card.get('color') == 'purple' || card.get('color') == 'city'));
+		var build_cost = card.get('cost') - (this.get('handle_player').hasDistrict('factory') && card.get('color') == 'purple');
 		
 		if (build_cost > this.get('handle_player').get('coins'))
 		{
@@ -117,6 +126,9 @@ App.Character = Ember.Object.extend({
 		if (card.get('name') == 'belltower') this.get('handle_player').set('can_use_belltower', true);
 		if (card.get('name') == 'lighthouse') this.get('handle_player').set('can_use_lighthouse', true);			
 		this.get('handle_player').get('districts').pushObject(card);
+		
+		game.checkFirstClosed(this.get('handle_player'));
+		
 		this.get('handle_player').set('coins', this.get('handle_player').get('coins')-build_cost); 
 		this.set('built',this.get('built')+1);
 		this.get('handle_player').get('cards').removeObject(card);
@@ -139,13 +151,14 @@ App.Character = Ember.Object.extend({
 			this.get('handle_player').set('can_use_lighthouse', false);
 		if (this.get('handle_player') && this.get('handle_player').get('exploding'))
 			this.get('handle_player').set('exploding', false);
+		this.set('is_current', false);
 		game.nextCharacter();
 	},
 	payTax : function(game) {
 		var tax = game.get('characters').get('content').findBy('name', 'Tax');
 		if (tax && tax.get('status') == 'in_hand') {
-			if (tax.get('state') == 'assasinated') return;
-			var tax_owner = tax.get(this.get('isAssasin') ? 'player' : 'handle_player');
+			if (tax.get('state') == 'assassinated') return;
+			var tax_owner = tax.get(this.get('isAssassin') ? 'player' : 'handle_player');
 			if (tax_owner === this.get('handle_player')) return;
 			if (!this.get('built')) return;
 			if (!this.get('handle_player').get('coins')) return;
@@ -160,8 +173,8 @@ App.Character = Ember.Object.extend({
 			game.set('activePlayer', witch_owner);
 		}
 	},
-	checkAssasinated : function(game) {
-		if (this.get('state') == 'assasinated') this.endTurn(game);
+	checkAssassinated : function(game) {
+		if (this.get('state') == 'assassinated') this.endTurn(game);
 	},
 	checkThanked : function(game) {
 		if (this.get('state') == 'bewitched') return;
@@ -218,7 +231,9 @@ App.Character = Ember.Object.extend({
 	resetParams : function() {
 		this.set('player', false);
 		this.set('handle_player', false);
-		this.set('took', false);
+		this.set('took', 0);
+		this.set('taking',false);
+		this.set('revealed', false);
 		this.set('built', 0);
 		this.set('state','normal');
 		this.set('status','in_round');
@@ -229,13 +244,12 @@ App.Character = Ember.Object.extend({
 	},
 	thanksYourExcellency : function() {
 		this.set('thanked', true);
-		console.log(this.get('thanked'));
 	},
 	inRound : function() {
 		return this.get('status') == 'in_round';
 	}.property('status'),
-	isAssasinated : function() {
-		return this.get('state') == 'assasinated';
+	isAssassinated : function() {
+		return this.get('state') == 'assassinated';
 	}.property('state'),
 	isRobbed : function() {
 		return this.get('state') == 'robbed';
@@ -247,38 +261,41 @@ App.Character = Ember.Object.extend({
 		return {
 			"player" : this.get('player') ? this.get('player').get('name') : false,
 			"handle_player" : this.get('handle_player') ? this.get('handle_player').get('name') : false,
+			"revealed" : this.get('revealed'),
 			"took" : this.get('took'),
+			"taking" : this.get('taking'),
 			"built" : this.get('built'),
 			"used_workshop" : this.get('used_workshop'),
 			"used_lab" : this.get('used_lab'),
 			"used_museum" : this.get('used_museum'),
 			"status" : this.get('status'),
 			"state" : this.get('state'),
-			"thanked" : this.get('thanked')
+			"thanked" : this.get('thanked'),
+			"is_current" : this.get('is_current')
 		}	
 	}
 });
 
-App.Assasin = App.Character.extend({
-	name : "Assasin",
+App.Assassin = App.Character.extend({
+	name : "Assassin",
 	desc: "Assassin. May select a character to Assassinate. That character loses their turn.",
-	isAssasin : true,
+	isAssassin : true,
 	number : 1,
 	pic: "character1.jpg",
-	assasinated: false,
-	assasinate : function(character) {
-		if (this.get('assasinated')) return;
-		if (character.get('isAssasin')) return;
-		character.set('state','assasinated');
-		this.set('assasinated', true);
+	assassinated: false,
+	assassinate : function(character) {
+		if (this.get('assassinated')) return;
+		if (character.get('isAssassin')) return;
+		character.set('state','assassinated');
+		this.set('assassinated', true);
 	},
 	resetParams : function() {
 		this._super();
-		this.set('assasinated', false);
+		this.set('assassinated', false);
 	},
 	serialize : function() {
 		var ret = this._super();
-		ret['assasinated'] = this.get('assasinated');
+		ret['assassinated'] = this.get('assassinated');
 		return ret;
 	}
 }
@@ -293,8 +310,9 @@ App.Thief = App.Character.extend({
 	robbed: false,
 	rob : function(character) {
 		if (this.get('robbed')) return;
-		if (character.get('isAssasin') || character.get('isThief')) return;
-		if (character.get('state') == 'assasinated') return;
+		if (character.get('number') == 1 || character.get('isThief')) return;
+		if (character.get('state') == 'assassinated') return;
+		if (character.get('state') == 'bewitched') return;
 		character.set('state','robbed');
 		this.set('robbed',true);
 	},
@@ -346,6 +364,7 @@ App.Magician = App.Character.extend({
 		this.set('did_magic', true);
 	},
 	discardCards : function(game) {
+		if (!this.get('choosed_to_discard')) return;
 		if (this.get('discarded')) return;
 		var n, draw;
 		var deck_content = game.get('deck').get('content');
@@ -366,6 +385,7 @@ App.Magician = App.Character.extend({
 	resetParams : function() {
 		this._super();
 		this.set('did_magic', false);
+		this.set('choosed_to_discard', false);
 		this.set('discarded', false);
 	},
 	serialize : function() {
@@ -432,11 +452,13 @@ App.Merchant = App.ColourCharacter.extend({
 	{
 		if (this.get('took')) return;
 		this._super(game);
-		this.get('handle_player').set('coins', this.get('handle_player').get('coins')+1);
+		if (this.get('is_current')) this.get('handle_player').set('coins', this.get('handle_player').get('coins')+1);
 	},
 	takeCard(game, card) {
 		this._super(game, card);
-		this.get('handle_player').set('coins', this.get('handle_player').get('coins')+1);
+		if (this.get('is_current'))
+			if (this.get('took') == 1 + this.get('player').hasDistrict('library'))
+				this.get('handle_player').set('coins', this.get('handle_player').get('coins')+1);
 	}
 });
 
@@ -450,11 +472,13 @@ App.Architect = App.Character.extend({
 	{
 		if (this.get('took')) return;
 		this._super(game);
-		this.take2Cards(game);
+		if (this.get('is_current')) this.take2Cards(game);
 	},
 	takeCard(game, card) {
 		this._super(game, card);
-		this.take2Cards(game);
+		if (this.get('is_current'))
+		    if (this.get('took') == 1 + this.get('player').hasDistrict('library'))
+			    this.take2Cards(game);
 	},
 	take2Cards(game) {
 		game.drawCards(this.get('handle_player'), 2);
@@ -485,13 +509,13 @@ App.Warlord = App.ColourCharacter.extend({
 		}
 		
 		var bishop = game.get('characters').get('content').findBy('name','Bishop');
-		if (bishop && bishop.get('state')!='assasinated' && bishop.get('handle_player') === player_to)
+		if (bishop && bishop.get('state')!='assassinated' && bishop.get('handle_player') === player_to)
 		{
 			game.showError("You can't destroy Bishop's district"); 
 			return;
 		}
 		
-		if (district.get('cost') + player_to.hasDistrict('greatwall') - 1 > this.get('handle_player').get('coins'))
+		if (district.get('cost') + player_to.hasDistrict('greatwall') - (district.get('name') == 'greatwall') - 1 > this.get('handle_player').get('coins'))
 		{
 			game.showError("You have not enough coins to destroy this district"); 
 			return;
@@ -499,9 +523,10 @@ App.Warlord = App.ColourCharacter.extend({
 		
 		if (district.get('status') == 'built' && district.get('player') === player_to)
 		{
-			this.get('handle_player').set('coins',this.get('handle_player').get('coins')-district.get('cost')-player_to.hasDistrict('greatwall')+1);
+			this.get('handle_player').set('coins',this.get('handle_player').get('coins')-district.get('cost')-player_to.hasDistrict('greatwall')+(district.get('name') == 'greatwall')+1);
 			player_to.get('districts').removeObject(district);
 			district.set('status', player_to.get('hasGraveyard') && player_to.get('coins') ? 'on_graveyard' : 'destroyed');
+			if (player_to.get('hasGraveyard') && player_to.get('coins')) player_to.set('on_graveyard', true);
 			if (district.get('name') == 'belltower') player_to.cancelRing(game);
 			district.set('player', false);
 			this.set('destroyed',true);
@@ -571,8 +596,7 @@ App.Wizard = App.Character.extend({
 		if (card.get('status') != 'on_wizard') return;
 		if (card.get('player')!== this.get('handle_player')) return;
 		
-		var build_cost = card.get('cost') - (this.get('handle_player').hasDistrict('factory') &&
-		(card.get('color') == 'purple' || card.get('color') == 'city'));
+		var build_cost = card.get('cost') - (this.get('handle_player').hasDistrict('factory') && card.get('color') == 'purple');
 		
 		if (build_cost > this.get('handle_player').get('coins'))
 		{
@@ -592,7 +616,7 @@ App.Wizard = App.Character.extend({
 		this.set('wizard_built', false);
 	},
 	endTurn : function(game) {
-		if (this.get('status') == 'in_hand' && this.get('state')!='assasinated')
+		if (this.get('status') == 'in_hand' && this.get('state')!='assassinated')
 		{
 			this.get('handle_player').get('cards').forEach(function(card) {
 				card.set('status', 'in_hand');
@@ -652,7 +676,7 @@ App.Abbot = App.ColourCharacter.extend({
 	color: "blue",
 	pic: "character15.jpg",
 	reveal : function(game) {
-		if (this.get('state') == 'assasinated' || this.get('status') == 'discarded' || this.get('state') == 'bewitched')
+		if (this.get('state') == 'assassinated' || this.get('status') == 'discarded' || this.get('state') == 'bewitched')
 		{
 			this._super(game);
 		}
@@ -663,7 +687,7 @@ App.Abbot = App.ColourCharacter.extend({
 	},
 	checkBewitched : function(game) {
 		this._super(game);
-		this.stealCoin(game);
+		if (this.get('state') == 'bewitched') this.stealCoin(game);
 	},
 	stealCoin : function(game) {
 		var handle_player = this.get('handle_player');
@@ -683,8 +707,7 @@ App.Alchemist = App.Character.extend({
 	pic: "character16.jpg",
 	build : function(game, card) {
 		if (this.get('built') == this.get('max_build')) return;
-		var coins_to_return = card.get('cost') - (this.get('handle_player').hasDistrict('factory') &&
-		(card.get('color') == 'purple' || card.get('color') == 'city'));
+		var coins_to_return = card.get('cost') - (this.get('handle_player').hasDistrict('factory') && card.get('color') == 'purple');
 		this._super(game, card);
 		if (this.get('built')) this.get('handle_player').set('coins', this.get('handle_player').get('coins') + coins_to_return);
 	}
@@ -757,12 +780,12 @@ App.Diplomat = App.ColourCharacter.extend({
 			{
 				game.showError("Keep can not be swapped");
 			}
-			else if (player.get('characters').findBy('name', 'Bishop') && player.get('characters').findBy('name', 'Bishop').get('state')!='assasinated'
+			else if (player.get('characters').findBy('name', 'Bishop') && player.get('characters').findBy('name', 'Bishop').get('state')!='assassinated'
 			&& player.get('characters').findBy('name', 'Bishop').get('handle_player') === player)
 			{
 				game.showError("You cannot swap with Bishop");
 			}
-			else if (enemy_district.get('cost') + player.hasDistrict('greatwall') > your_district.get('cost') + this.get('handle_player').get('coins'))
+			else if (enemy_district.get('cost') + player.hasDistrict('greatwall') - (enemy_district.get('name') == 'greatwall') > your_district.get('cost') + this.get('handle_player').get('coins'))
 			{
 				game.showError("Not enough coins to swap this district");
 			}
@@ -772,8 +795,8 @@ App.Diplomat = App.ColourCharacter.extend({
 			    game.showError("You cannot swap dublicate districts");
 			}
 			else {
-				if (enemy_district.get('cost') + player.hasDistrict('greatwall') > your_district.get('cost'))
-					compensation = enemy_district.get('cost') + player.hasDistrict('greatwall') - your_district.get('cost');
+				if (enemy_district.get('cost') + player.hasDistrict('greatwall') - (enemy_district.get('name') == 'greatwall') > your_district.get('cost'))
+					compensation = enemy_district.get('cost') + player.hasDistrict('greatwall') - (enemy_district.get('name') == 'greatwall') - your_district.get('cost');
 				this.get('handle_player').set('coins', this.get('handle_player').get('coins') - compensation);
 				player.set('coins', player.get('coins') + compensation);
 				player.get('districts').removeObject(enemy_district);
@@ -782,6 +805,8 @@ App.Diplomat = App.ColourCharacter.extend({
 				this.get('handle_player').get('districts').pushObject(enemy_district);
 				your_district.set('player', player);
 				enemy_district.set('player', this.get('handle_player'));
+				if (your_district.get('name') == 'city') your_district.set('color', 'purple');
+				if (enemy_district.get('name') == 'city') enemy_district.set('color', 'purple');
 				this.set('swapped', true);
 			}
 			
@@ -794,7 +819,7 @@ App.Characters = Ember.Object.extend({
 	init() {
 		this.set('content', []);
 		var characters_content = this.get('content');
-		characters_content.pushObject(this.inExtended(1) ? App.Witch.create() : App.Assasin.create());
+		characters_content.pushObject(this.inExtended(1) ? App.Witch.create() : App.Assassin.create());
 		characters_content.pushObject(this.inExtended(2) ? App.TaxCollector.create() : App.Thief.create());
 		characters_content.pushObject(this.inExtended(3) ? App.Wizard.create() : App.Magician.create());
 		characters_content.pushObject(this.inExtended(4) ? App.Emperor.create() : App.King.create());

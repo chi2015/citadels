@@ -2,8 +2,9 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Citadelles Game</title>
+  <title>Citadels Game</title>
   <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body>  
   <script type="text/x-handlebars" data-template-name="index">
@@ -31,60 +32,61 @@
 						<p>Game type:</p>
 						<div class="input-radio-block">
 							{{#unless model.is_extended}}
-								<input {{action 'setExtended'}} type="radio" value="classic" name="game_type" checked="checked"/>
+								<input {{action 'setExtended'}} type="radio" value="classic" name="game_type" checked="checked" id="rb_classic"/>
 							{{/unless}}
 							{{#if model.is_extended}}
-								<input {{action 'setExtended'}} type="radio" value="classic" name="game_type"/>
+								<input {{action 'setExtended'}} type="radio" value="classic" name="game_type" id="rb_classic"/>
 							{{/if}}
-							<label>Classic</label>
+							<label for="rb_classic">Classic</label>
 						</div>
 						<div class="input-radio-block">
 							{{#if model.is_extended}}
-								<input {{action 'setExtended'}} type="radio" value="extended" name="game_type" checked="checked"/>
+								<input {{action 'setExtended'}} type="radio" value="extended" name="game_type" checked="checked" id="rb_extended"/>
 							{{/if}}
 							{{#unless model.is_extended}}
-								<input {{action 'setExtended'}} type="radio" value="extended" name="game_type"/>
+								<input {{action 'setExtended'}} type="radio" value="extended" name="game_type" id="rb_extended"/>
 							{{/unless}}
-							<label>Extended</label>
+							<label for="rb_extended">Extended</label>
 						</div>
 					</div>
 					{{#if model.is_extended}}
 					<div class="extended_characters_block">
-						<p>Extended characters:</p>
+						<p>Extended characters*:</p>
 						<button {{action 'randomExtended'}}>Random choice</button>
 						<div class="ext_cb_block">
 							<input type="checkbox" id="cb_ext_1"/>
-							<label for id="cb_ext_1">Witch</label>
+							<label for="cb_ext_1">Witch</label>
 						</div>
 						<div class="ext_cb_block">
 							<input type="checkbox" id="cb_ext_2"/>
-							<label for id="cb_ext_2">Tax collector</label>
+							<label for="cb_ext_2">Tax collector</label>
 						</div>
 						<div class="ext_cb_block">
 							<input type="checkbox" id="cb_ext_3"/>
-							<label for id="cb_ext_3">Wizard</label>
+							<label for="cb_ext_3">Wizard</label>
 						</div>
 						<div class="ext_cb_block">
 							<input type="checkbox" id="cb_ext_4"/>
-							<label for id="cb_ext_4">Emperor</label>
+							<label for="cb_ext_4">Emperor</label>
 						</div>
 						<div class="ext_cb_block">
 							<input type="checkbox" id="cb_ext_5"/>
-							<label for id="cb_ext_5">Abbot</label>
+							<label for="cb_ext_5">Abbot</label>
 						</div>
 						<div class="ext_cb_block">
 							<input type="checkbox" id="cb_ext_6"/>
-							<label for id="cb_ext_6">Alchemist</label>
+							<label for="cb_ext_6">Alchemist</label>
 						</div>
 						<div class="ext_cb_block">
 							<input type="checkbox" id="cb_ext_7"/>
-							<label for id="cb_ext_7">Navigator</label>
+							<label for="cb_ext_7">Navigator</label>
 						</div>
 						<div class="ext_cb_block">
 							<input type="checkbox" id="cb_ext_8"/>
-							<label for id="cb_ext_8">Diplomat</label>
+							<label for="cb_ext_8">Diplomat</label>
 						</div>
 					</div>
+					<p class="notice">*Notice: the game becomes disbalanced when count of extended characters is more than two</p>
 					{{/if}}
 					<div class="start-button-block">
 						<button type="submit">Start</button>
@@ -105,7 +107,7 @@
 				{{/if}}
 				{{#unless model.player1.on_coronation}}
 				{{#unless model.player2.on_coronation}}
-					{{model.activePlayer.name}}'s turn
+					{{model.activePlayer.name}}'s turn{{#if model.automatic}}{{#if model.activePlayer.is_robot}}{{#if model.activePlayer.time}} (0:0{{model.activePlayer.time}}){{/if}}{{/if}}{{/if}}
 				{{/unless}}
 				{{/unless}}
 			{{#if model.player1.on_coronation}}{{model.player1.name}}'s turn{{/if}}
@@ -150,13 +152,13 @@
 			{{/if}}
 			{{#if model.phazeIsAction }}
 				{{#unless model.player1Blocked}}
-				{{#if model.currentCharacter.isAssasin}}
-					{{#unless model.currentCharacter.assasinated }}
-					<p>Choose character to assasinate</p>
+				{{#if model.currentCharacter.isAssassin}}
+					{{#unless model.currentCharacter.assassinated }}
+					<p>Choose character to assassinate</p>
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
-						{{#unless character.isAssasin}}
-							<img {{action "assasinateCharacter" model.currentCharacter character}} src="characters/{{character.pic}}"/>
+						{{#unless character.isAssassin}}
+							<img {{action "assassinateCharacter" model.currentCharacter character}} src="characters/{{character.pic}}"/>
 						{{/unless}}
 					{{/each}}
 					</div>
@@ -179,10 +181,10 @@
 					<p>Choose character to rob</p>
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
-						{{#unless character.isAssasin}}
+						{{#unless character.isAssassin}}
 						{{#unless character.isWitch}}
 						{{#unless character.isThief}}
-						{{#unless character.isAssasinated}}
+						{{#unless character.isAssassinated}}
 						{{#unless character.isBewitched}}
 							<img {{action "robCharacter" model.currentCharacter character}} src="characters/{{character.pic}}"/>
 						{{/unless}}
@@ -239,7 +241,7 @@
 				{{/if}}
 				{{/unless}}
 				<div class="actions-block">
-					{{#unless model.currentCharacter.took}}
+					{{#unless model.currentCharacter.taking}}
 					{{#if model.currentCharacter.canTake}}
 						<button {{action 'takeCoins' model model.currentCharacter}}>Take 2 coins</button>
 						<button {{action 'chooseCards' model model.currentCharacter}}>Choose cards</button>
@@ -248,7 +250,7 @@
 					{{#if model.player2.hasBallroom}}
 						{{#if model.player2.has_crown}}
 							{{#unless model.currentCharacter.isBewitched}}
-							{{#unless model.currentCharacter.isAssasinated}}
+							{{#unless model.currentCharacter.isAssassinated}}
 							{{#unless model.currentCharacter.thanked}}
 								<button {{action 'thanksYourExcellency' model.currentCharacter}}>Thanks, your Excellency!</button>
 							{{/unless}}
@@ -438,8 +440,8 @@
 					{{#each model.player1.characters as |character|}}
 							<div class="character-block tooltip">
 								<div class="character-notes">
-									{{#if character.isAssasinated }}
-										assasinated
+									{{#if character.isAssassinated }}
+										assassinated
 									{{/if}}
 									{{#if character.isRobbed }}
 										robbed
@@ -448,7 +450,12 @@
 										bewitched
 									{{/if}}
 								</div>
-								<img src="characters/{{character.pic}}"/>
+								{{#if character.is_current}}
+									<img src="characters/{{character.pic}}" class="current"/>
+								{{/if}}
+								{{#unless character.is_current}}
+									<img src="characters/{{character.pic}}"/>
+								{{/unless}}
 								<span class="tooltiptext">{{character.desc}}</span>
 							</div>
 					{{/each}}
@@ -489,13 +496,19 @@
 						<div style="margin: 0 5px 2px 0;">
 							<span style="color:#ff0000">C</span>
 							<span style="color:#ffcc00">O</span>
-							<span style="color:#ff0000">L</span>
+							<span style="color:#009933">L</span>
 							<span style="color:#0000ff">O</span>
 							<span style="color:#9900ff">R</span>
 						</div>
 					{{/if}}
 					{{#if model.player1.hasMuseum}}{{#if model.player1.cards_under_museum}}<div style="margin: 0 5px 2px 0;">Cards under museum: {{model.player1.cards_under_museum}}</div>{{/if}}{{/if}}
-					{{#if model.player1.closed}}<div style="margin: 0 5px 2px 0;"><span style="color:white;">Closed</span></div>{{/if}}
+					{{#if model.player1.closed}}
+						{{#if model.player1.closed_first}}
+						<div style="margin: 0 5px 2px 0;"><span style="color:white;">Closed</span></div>
+						{{else}}
+						<div style="margin: 0 5px 2px 0;"><span style="color:black;">Closed</span></div>
+						{{/if}}
+					{{/if}}
 				</div>
 			</div>
 		</div>
@@ -510,19 +523,50 @@
 				<div class="characters-list">
 					{{#each model.player2.characters as |character|}}
 							<div class="character-block tooltip">
-								<div class="character-notes">
-									{{#if character.isAssasinated }}
-										assasinated
+								{{#if model.hideRobotCards}}
+									{{#if character.revealed}}
+										<div class="character-notes">
+											{{#if character.isAssassinated }}
+												assassinated
+											{{/if}}
+											{{#if character.isRobbed }}
+												robbed
+											{{/if}}
+											{{#if character.isBewitched }}
+												bewitched
+											{{/if}}
+										</div>
+										{{#if character.is_current}}
+											<img src="characters/{{character.pic}}" class="current"/>
+										{{/if}}
+										{{#unless character.is_current}}
+											<img src="characters/{{character.pic}}"/>
+										{{/unless}}
+										<span class="tooltiptext">{{character.desc}}</span>
+									{{else}}
+										<div class="character-notes"></div>
+										<img src="faceup.jpg"/>
 									{{/if}}
-									{{#if character.isRobbed }}
-										robbed
+								{{else}}
+									<div class="character-notes">
+										{{#if character.isAssassinated }}
+											assassinated
+										{{/if}}
+										{{#if character.isRobbed }}
+											robbed
+										{{/if}}
+										{{#if character.isBewitched }}
+											bewitched
+										{{/if}}
+									</div>
+									{{#if character.is_current}}
+										<img src="characters/{{character.pic}}" class="current"/>
 									{{/if}}
-									{{#if character.isBewitched }}
-										bewitched
-									{{/if}}
-								</div>
-									<img src="characters/{{character.pic}}"/>
+									{{#unless character.is_current}}
+										<img src="characters/{{character.pic}}"/>
+									{{/unless}}
 									<span class="tooltiptext">{{character.desc}}</span>
+								{{/if}}	
 							</div>
 					{{/each}}
 				</div>
@@ -568,10 +612,17 @@
 						</div>
 					{{/if}}
 					{{#if model.player2.hasMuseum}}{{#if model.player2.cards_under_museum}}<div style="margin: 0 5px 2px 0;">Cards under museum: {{model.player2.cards_under_museum}}</div>{{/if}}{{/if}}
-					{{#if model.player2.closed}}<div style="margin: 0 5px 2px 0;"><span style="color:white;">Closed</span></div>{{/if}}
+					{{#if model.player2.closed}}
+						{{#if model.player2.closed_first}}
+						<div style="margin: 0 5px 2px 0;"><span style="color:white;">Closed</span></div>
+						{{else}}
+						<div style="margin: 0 5px 2px 0;"><span style="color:black;">Closed</span></div>
+						{{/if}}
+					{{/if}}
 				</div>
 			</div>
 		</div>
+		{{#unless model.hideRobotCards}}
 		<div class="districts-block">
 			{{#if model.player2.hasGraveyard}}
 				{{#if model.deck.card_on_graveyard}}
@@ -679,13 +730,13 @@
 			{{/if}}
 			{{#if model.phazeIsAction }}
 				{{#unless model.player2Blocked}}
-				{{#if model.currentCharacter.isAssasin}}
-					{{#unless model.currentCharacter.assasinated }}
-					<p>Choose character to assasinate</p>
+				{{#if model.currentCharacter.isAssassin}}
+					{{#unless model.currentCharacter.assassinated }}
+					<p>Choose character to assassinate</p>
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
-						{{#unless character.isAssasin}}
-							<img {{action "assasinateCharacter" model.currentCharacter character}} src="characters/{{character.pic}}"/>
+						{{#unless character.isAssassin}}
+							<img {{action "assassinateCharacter" model.currentCharacter character}} src="characters/{{character.pic}}"/>
 						{{/unless}}
 					{{/each}}
 					</div>
@@ -708,10 +759,10 @@
 					<p>Choose character to rob</p>
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
-						{{#unless character.isAssasin}}
+						{{#unless character.isAssassin}}
 						{{#unless character.isWitch}}
 						{{#unless character.isThief}}
-						{{#unless character.isAssasinated}}
+						{{#unless character.isAssassinated}}
 						{{#unless character.isBewitched}}
 							<img {{action "robCharacter" model.currentCharacter character}} src="characters/{{character.pic}}"/>
 						{{/unless}}
@@ -768,7 +819,7 @@
 				{{/if}}
 				{{/unless}}
 				<div class="actions-block">
-					{{#unless model.currentCharacter.took}}
+					{{#unless model.currentCharacter.taking}}
 					{{#if model.currentCharacter.canTake}}
 						<button {{action 'takeCoins' model model.currentCharacter}}>Take 2 coins</button>
 						<button {{action 'chooseCards' model model.currentCharacter}}>Choose cards</button>
@@ -776,7 +827,7 @@
 					{{#if model.player1.hasBallroom}}
 						{{#if model.player1.has_crown}}
 							{{#unless model.currentCharacter.isBewitched}}
-							{{#unless model.currentCharacter.isAssasinated}}
+							{{#unless model.currentCharacter.isAssassinated}}
 							{{#unless model.currentCharacter.thanked}}
 								<button {{action 'thanksYourExcellency' model.currentCharacter}}>Thanks, your Excellency!</button>
 							{{/unless}}
@@ -878,10 +929,11 @@
 					{{/if}}
 			{{/if}}
 		{{/if}}
+		{{/unless}}
 		<p class="notes-head">Game notes</p>
 		<div class="gamenotes-block">
 			{{#each model.characters.content as |character|}}
-				{{#if character.isAssasinated}}{{character.name}} is assasinated<br/>{{/if}}
+				{{#if character.isAssassinated}}{{character.name}} is assassinated<br/>{{/if}}
 				{{#if character.isBewitched}}{{character.name}} is bewitched<br/>{{/if}}
 				{{#if character.isRobbed}}{{character.name}} is robbed<br/>{{/if}}
 			{{/each}}
@@ -891,12 +943,13 @@
   </script>
 
   <script src="js/libs/jquery-1.10.2.js"></script>
-  <script src="js/libs/ember-template-compiler-2.0.1.js"></script>
-  <script src="js/libs/ember-2.0.1.debug.js"></script>
+  <script src="js/libs/ember-template-compiler-2.6.0.js"></script>
+  <script src="js/libs/ember-2.6.0.debug.js"></script>
   <script src="js/app.js"></script>
   <script src="js/deck.js"></script>
   <script src="js/characters.js"></script>
   <script src="js/player.js"></script>
+  <script src="js/strategy.js"></script>
   <script src="js/game.js"></script>
   <script src="js/index.js"></script>
 </body>

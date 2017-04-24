@@ -95,7 +95,7 @@ App.Deck = Ember.Object.extend({
 		for (i=0; i<2; i++) 
 			deck_content.pushObject(App.Card.create({"name":"keep","desc":"Keep. The Keep cannot be destroyed by the Warlord.","color":"purple","pic":"keep.jpg","cost":3}));
 			
-		deck_content.pushObject(App.Card.create({"name":"city","desc":"Miracle Courtyard. At the end of the game, the Miracle Courtyard counts as a colour of your choice.","color":"city","pic":"city.jpg","cost":2}));
+		deck_content.pushObject(App.Card.create({"name":"city","desc":"Miracle Courtyard. At the end of the game, the Miracle Courtyard counts as a colour of your choice.","color":"purple","pic":"city.jpg","cost":2}));
 		deck_content.pushObject(App.Card.create({"name":"observatory","desc":"Observatory. If you choose to draw cards at the begining of your turn, you may pick three cards, keep one of your choice and place the two others at the bottom the deck.","color":"purple","pic":"observatory.jpg","cost":5}));
 		deck_content.pushObject(App.Card.create({"name":"lab","desc":"Laboratory. Once per turn, you may discard a District card from your hand and get a gold piece in return.","color":"purple","pic":"lab.jpg","cost":5}));
 		deck_content.pushObject(App.Card.create({"name":"workshop","desc":"Workshop. Once per turn, you may pay 3 gold to draw 3 cards.","color":"purple","pic":"workshop.jpg","cost":5}));
@@ -123,12 +123,12 @@ App.Deck = Ember.Object.extend({
 		{"name":"maproom","desc":"Map Room. At the end of the game, you score 1 victory point bonus for each card in your hand.","color":"purple","pic":"maproom.jpg","cost":5}
 	],
 	initExtendedDeck : function() {
-		/*for test 
-		var extended_deck = this.get('extended_deck');
-		for (var i=0; i<extended_deck.length; i++)
-			this.get('content').pushObject(App.Card.create(extended_deck[i]));
-		*/
 		
+		//for test 
+	/*	var extended_deck = this.get('extended_deck');
+		for (var i=0; i<extended_deck.length; i++)
+			this.get('content').pushObject(App.Card.create(extended_deck[i]));*/
+
 		var n, chosen = false, deck_content = this.get('content'), extended_deck = this.get('extended_deck');
 		for (var i=0; i<3; i++)
 		{
@@ -143,7 +143,7 @@ App.Deck = Ember.Object.extend({
 						deck_content.pushObject(App.Card.create(extended_deck[n]));
 					}
 			}
-			console.log(extended_deck[n]["name"]);
+			//console.log(extended_deck[n]["name"]);
 		}
 	}
 });

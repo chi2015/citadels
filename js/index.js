@@ -46,7 +46,7 @@ App.IndexRoute = Ember.Route.extend({
   		},
   		randomExtended : function() {
 			var gen_arr = [1,2,3,4,5,6,7,8];
-			var ext_cnt = Math.floor(Math.random() * gen_arr.length);
+			var ext_cnt = Math.random() < 0.5 ? 6 : 7;
 			for (var i=0; i<ext_cnt; i++) gen_arr.splice(Math.floor(Math.random() * gen_arr.length), 1);
 			$('input[id^="cb_ext_"]').prop('checked', false);
 			for (var j=0; j<gen_arr.length; j++) {
@@ -83,9 +83,9 @@ App.IndexRoute = Ember.Route.extend({
 		endTurn : function(game, character) {
 			character.endTurn(game);
 		},
-		assasinateCharacter : function(assasin, character)
+		assassinateCharacter : function(assassin, character)
 		{
-			assasin.assasinate(character);
+			assassin.assassinate(character);
 		},
 		bewitchCharacter : function(witch, character)
 		{

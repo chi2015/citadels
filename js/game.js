@@ -3,11 +3,15 @@ App.Game = Ember.Object.extend({
 	name: "new game",
 	player1 : null,
 	player2: null,
+	player1_strategy: null,
+	player2_strategy: null,
 	activePlayer : null,
 	deck : null,
 	characters : null,
 	currentCharacter : null,
 	first_full_city : false,
+	automatic : true, //false for manual robot handle, true for automatic robot
+	hide_robot_cards: true, //true for normal game (game must be automatic), false to see robot cards (debug mode)
 	winner : "",
 	is_extended : false,
 	extended : [],
@@ -22,6 +26,17 @@ App.Game = Ember.Object.extend({
 	},
 	setFirstPlayer : function() {
 		this.set('activePlayer', Math.random() < 0.5 ? this.get('player1') : this.get('player2'));
+	},
+	setStrategy : function() {
+		if (!player2_strategy) player2_strategy = App.Strategy.create({game: this, player: this.get('player2')});
+		else 
+		{
+			player2_strategy.set('player', this.get('player2'));
+			player2_strategy.set('enemy', this.get('player1'));
+			player2_strategy.addObserversPlayers();
+			player2_strategy.resetTimer();
+		}
+		this.set('player2_strategy', player2_strategy);	
 	},
 	setCrownTo : function(player) {
 		var old_crown_owner = this.get('player1').get('has_crown') ? this.get('player1') : this.get('player2');
@@ -39,10 +54,12 @@ App.Game = Ember.Object.extend({
 			
 			this.set('name',name);
 			this.set('extended', extended);
-			var player1 = App.Player.create({ name :  player1_name, districts : [], characters : [], cards : []});
-			var player2 = App.Player.create({ name :  player2_name, is_robot : true, districts : [], characters : [], cards : []});
+			var player1 = App.Player.create({ name :  player1_name, districts : [], characters : [], possible_characters : [], cards : []});
+			var player2 = App.Player.create({ name :  player2_name, is_robot : true, districts : [], characters : [], possible_characters : [], cards : []});
 			this.set('player1', player1);
 			this.set('player2', player2);
+			
+			if (this.get('automatic')) this.setStrategy();
 			
 			this.setFirstPlayer();
 			this.get('activePlayer').set('has_crown',true);
@@ -60,8 +77,6 @@ App.Game = Ember.Object.extend({
 			
 			this.resetCharacters();
 			this.set('phaze','choose');
-			
-			//console.log(JSON.stringify(this.get('deck')));
 	},
 	finish : function(text) {
 		if (confirm("Are you sure you want to finish this game?"))
@@ -76,9 +91,10 @@ App.Game = Ember.Object.extend({
 		this.set('winner', '');
 		this.set('extended', []);
 		this.set('phaze','start');
+		//delete all game objects
 	},
 	showError : function(text) {
-		alert(text);
+		if (!this.get('activePlayer') || !this.get('activePlayer').get('is_robot')) alert(text);
 	},
 	init() {
 		//console.log(JSON.stringify(localStorage.getItem('game')));
@@ -100,6 +116,8 @@ App.Game = Ember.Object.extend({
 		this.set('extended', game.extended);
 		this.set('player1', App.Player.create(game.player1));
 		this.set('player2', App.Player.create(game.player2));
+		
+		this.setStrategy();
 		
 		var gamePlayers = [], owner, handle_player;
 		gamePlayers.pushObject(this.get('player1'));
@@ -175,12 +193,11 @@ App.Game = Ember.Object.extend({
 		var n, draw = false, card,
 			deck_content = this.get('deck').get('content'),
 			deck_length = deck_content.length;
-		
 		while (!draw) {
 			n = Math.floor(Math.random() * deck_length);
 			card = deck_content.objectAt(n);
 			if (card.get('status') == 'in_deck')
-				{
+				{	
 					card.set('status', 'in_hand');
 					card.set('player', player);
 					player.get('cards').pushObject(card);
@@ -194,16 +211,19 @@ App.Game = Ember.Object.extend({
 	robotActivePlayer : function() {
   		return this.get('activePlayer') === this.get('player2');
 	}.property('activePlayer'),
+	hideRobotCards : Ember.computed('automatic', 'hide_robot_cards', function() {
+		return this.get('automatic') && this.get('hide_robot_cards');
+	}),
 	player1Blocked : Ember.computed('activePlayer', 'player1', 'player2', 'currentCharacter', 'currentCharacter.thanked', function() {
 		return (this.get('currentCharacter').get('state') == 'bewitched' && this.get('currentCharacter').get('player') === this.get('player1')
-		&& this.get('activePlayer') === this.get('player1')) || (this.get('currentCharacter').get('state') == 'assasinated' && 
+		&& this.get('activePlayer') === this.get('player1')) || (this.get('currentCharacter').get('state') == 'assassinated' && 
 		this.get('currentCharacter').get('player') === this.get('player1'))
 		|| (this.get('player2').get('hasBallroom') && this.get('player2').get('has_crown') && this.get('currentCharacter').get('state') != 'bewitched' 
 		&& !this.get('currentCharacter').get('thanked'));
 	}),
 	player2Blocked : Ember.computed('activePlayer', 'player1', 'player2','currentCharacter', 'currentCharacter.thanked', function() {
 		return (this.get('currentCharacter').get('state') == 'bewitched' && this.get('currentCharacter').get('player') === this.get('player2')
-		&& this.get('activePlayer') === this.get('player2')) || (this.get('currentCharacter').get('state') == 'assasinated' && 
+		&& this.get('activePlayer') === this.get('player2')) || (this.get('currentCharacter').get('state') == 'assassinated' && 
 		this.get('currentCharacter').get('player') === this.get('player2'))
 		|| (this.get('player1').get('hasBallroom') && this.get('player1').get('has_crown') && this.get('currentCharacter').get('state') != 'bewitched' 
 		&& !this.get('currentCharacter').get('thanked'));
@@ -245,7 +265,9 @@ App.Game = Ember.Object.extend({
 				break;
 								
 			case 1: 
-				this.get('characters').get('content').findBy('status','in_round').set('status', 'discarded');
+				var last_character = this.get('characters').get('content').findBy('status','in_round');
+				last_character.set('status', 'discarded');
+				this.get('activePlayer').addToPossibleCharacters(last_character);
 				this.set('phaze', 'action'); 
 				this.nextCharacter();
 				break;
@@ -263,14 +285,11 @@ App.Game = Ember.Object.extend({
 	},
 	nextCharacter : function() {
 		
-		this.checkFirstClosed(this.get('activePlayer'));
-		
 		var character = this.get('currentCharacter');
 		var n = !character ? 0 : character.get('number');
 		if (n == 8)
 		{
 			this.set('currentCharacter', null);
-			this.resetCharacters();
 			
 			if (this.get('first_full_city'))
 			{
@@ -280,9 +299,12 @@ App.Game = Ember.Object.extend({
 			else {
 				this.set('phaze','choose');
 				this.set('activePlayer', this.get('player1').get('has_crown') ? this.get('player1') : this.get('player2'));
-				this.get('player1').set('characters',[]);
-				this.get('player2').set('characters',[]);
+				if (this.get('deck').get('content').findBy('name', 'city').get('status') == 'built')
+					this.get('deck').get('content').findBy('name', 'city').set('color', 'city');
 			}
+			
+			this.resetCharacters();
+			
 			return;	
 		}
 		
@@ -303,8 +325,11 @@ App.Game = Ember.Object.extend({
 		
 		this.get('player1').set('characters', []);
 		this.get('player2').set('characters', []);
+		this.get('player1').set('possible_characters', []);
+		this.get('player2').set('possible_characters', []);
 		
 		var d = Math.floor(Math.random() * characters.length);
 		characters.objectAt(d).set('status', 'discarded');
+		this.get('activePlayer').addToPossibleCharacters(characters.objectAt(d));
 	}
 });

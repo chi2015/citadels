@@ -1,5 +1,6 @@
 App.Player = Ember.Object.extend({
 	is_robot: false,
+	time: 0,
 	has_crown : false,
 	name : null,
 	closed : Ember.computed('districts.length', 'districts_to_close', function() {
@@ -10,6 +11,7 @@ App.Player = Ember.Object.extend({
 	coins : 2,
 	cards_under_museum : 0,
 	on_coronation: false,
+	on_graveyard: false,
 	districtOnSwap : Ember.computed('districts.@each.status', function() {
 		return this.get('districts').filterBy('status', 'on_swap').length;
 	}),
@@ -37,14 +39,14 @@ App.Player = Ember.Object.extend({
 		game.setCrownTo(this);
 		this.set('on_coronation', false);
 	},
-	hasAllColours : Ember.computed('districts.[]', function() {
+	hasAllColours : Ember.computed('districts.@each.color', function() {
 		var colors = [];
 		this.get('districts').forEach(function(item) {
 			if (item.get('color')) colors.push(item.get('color'));
 		});
 		return colors.uniq().length >= 5;
 	}),
-	score : Ember.computed('districts.[]', 'closed', 'closed_first', 'coins', 'cards.[]', 'cards_under_museum', function() {
+	score : Ember.computed('districts.@each.color', 'closed', 'closed_first', 'coins', 'cards.[]', 'cards_under_museum', function() {
     	var ret = 0;
 		this.get('districts').forEach(function(item) {
 			ret += item.get('cost');
@@ -159,6 +161,7 @@ App.Player = Ember.Object.extend({
 			this.get('cards').pushObject(card);
 		}
 		
+		this.set('on_graveyard', false);
 		card.set('status', pay ? 'in_hand' : 'destroyed');
 		card.set('player', pay ? this : false);
 	},
@@ -168,10 +171,17 @@ App.Player = Ember.Object.extend({
 			this.get('characters').pushObject(character);
 			character.set('status', 'in_hand');
 			character.set('player', this);
+			this.addToPossibleCharacters(character);
 		}
 	},
 	discardCharacter : function(character) {
-		if (character.get('status') == 'in_round') character.set('status', 'discarded');
+		if (character.get('status') == 'in_round') {
+			character.set('status', 'discarded');
+			this.addToPossibleCharacters(character);
+		}
+	},
+	addToPossibleCharacters : function(character) {
+		this.get('possible_characters').pushObject(character.get('number'));
 	},
 	serialize : function() {
 		return {"name" : this.get("name"),
@@ -180,12 +190,14 @@ App.Player = Ember.Object.extend({
 		"coins" : this.get("coins"),
 		"closed_first" : this.get("closed_first"),
 		"on_coronation" : this.get("on_coronation"),
+		"on_graveyard" : this.get("on_graveyard"),
 		"districts_to_close" : this.get("districts_to_close"),
 		"can_use_belltower" : this.get("can_use_belltower"),
 		"can_use_lighthouse" : this.get("can_use_lighthouse"),
 		"using_lighthouse" : this.get("using_lighthouse"),
 		"exploding" : this.get("exploding"),
-		"cards_under_museum" : this.get("cards_under_museum")
-		};
+		"cards_under_museum" : this.get("cards_under_museum"),
+		"possible_characters" : this.get("possible_characters")
+		}
 	}
 });
