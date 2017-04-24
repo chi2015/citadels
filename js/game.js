@@ -1,7 +1,7 @@
 App.Game = Ember.Object.extend({
 	
 	name: "new game",
-	version: "1.0.2",
+	version: "1.0.3",
 	player1 : null,
 	player2: null,
 	player1_strategy: null,
@@ -87,7 +87,7 @@ App.Game = Ember.Object.extend({
 			this.drawCards(this.get('player1'), 4);
 			this.drawCards(this.get('player2'), 4);
 			
-			//this.drawCard(this.get('player2'), 'lighthouse');
+			//this.drawCard(this.get('player1'), 'armory');
 			
 			this.set('currentCharacter', null);
 			

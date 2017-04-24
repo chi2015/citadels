@@ -134,12 +134,14 @@ App.IndexRoute = Ember.Route.extend({
 			if (player_to === game.get('activePlayer')) return;
 			if (game.get('activePlayer') === game.get('player1') && game.get('player1Blocked')) return;
 			if (game.get('activePlayer') === game.get('player2') && game.get('player2Blocked')) return;
+			if (game.get('activePlayer').get('is_robot') && game.get('automatic')) return;
 			if (character && character.get('isWarlord')) character.destroy(game, player_to, district);
 		},
 		swap : function(game, character, district) {
 			var player_to = game.get('activePlayer') === game.get('player2') ? game.get('player1') : game.get('player2');
 			if (game.get('activePlayer') === game.get('player1') && game.get('player1Blocked')) return;
 			if (game.get('activePlayer') === game.get('player2') && game.get('player2Blocked')) return;
+			if (game.get('activePlayer').get('is_robot') && game.get('automatic')) return;
 			if (character && character.get('isDiplomat')) character.swap(game, player_to, district);
 		},
 		useWorkshop : function(game, character) {

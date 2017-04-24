@@ -230,7 +230,8 @@ App.Strategy = Ember.Object.extend({
 	},
 	randomCharacter : function() {
 		var characters = this.get('game').get('characters').get('content').filterBy('status', 'in_round');
-		if (this.get('player').get('has_crown') || this.endOfGame()) characters = characters.rejectBy('name', 'Navigator');
+		if ((this.get('player').get('has_crown') || this.endOfGame()) && !this.get('player').get('characters').findBy('number', 8)) 
+			characters = characters.rejectBy('name', 'Navigator');
 		var random_character = characters.objectAt(Math.floor(Math.random() * characters.length));
 		return random_character;
 	},
@@ -322,10 +323,10 @@ App.Strategy = Ember.Object.extend({
 				return false;
 			}
 			
-	    if (this.get('game').get('characters').get('content').findBy('name', 'Magician') &&
-	        this.get('game').get('currentCharacter').get('number') < 3 && 
+	    if (this.get('game').get('currentCharacter').get('number') < 3 && 
 	        (!this.get('player').get('cards').length || this.hasAllDublicates()) &&
-	        this.get('player').get('coins') < 2 && this.isPossibleEnemyCharacter(3))
+	        this.get('player').get('coins') < 2 && this.isPossibleEnemyCharacter(3) &&
+	      (this.get('game').get('characters').get('content').findBy('name','Wizard') || this.get('enemy').get('cards').length < 2 ) )
 	        {
 				return false;
 			}
@@ -428,6 +429,8 @@ App.Strategy = Ember.Object.extend({
 			this.get('game').get('currentCharacter').coronate(this.get('game'), this.get('enemy'));
 			if (this.get('enemy').get('on_coronation')) return;
 		}
+		
+		this.destroyArmoryStrategy();
 		
 		if (this.checkChooseCard()) 
 		{
@@ -802,6 +805,14 @@ App.Strategy = Ember.Object.extend({
 			this.get('player').onExplode();
 			this.get('player').explodeArmory(this.get('game'), district_to_explode);
 		}
+	},
+	destroyArmoryStrategy : function() {
+		if (!this.get('enemy').hasDistrict('armory')) return;
+		if (this.get('game').get('currentCharacter').get('name')!='Warlord') return;
+		if (['bewitched', 'assassinated'].indexOf(this.get('game').get('currentCharacter').get('state')) > -1) return;
+		if (this.get('player').get('districts').filterBy('color', 'red').length > 1) this.get('game').get('currentCharacter').takeIncome();
+		else if (this.get('player').get('coins') < 2) this.get('game').get('currentCharacter').takeCoins(this.get('game'));
+		this.get('game').get('currentCharacter').destroy(this.get('game'), this.get('enemy'), this.get('enemy').get('districts').findBy('name', 'armory'));
 	},
 	checkWillUseAlchemist : function() {
 		if (!this.get('game').get('characters').get('content').findBy('name', 'Alchemist')) return false;

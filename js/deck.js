@@ -105,7 +105,7 @@ App.Deck = Ember.Object.extend({
 		deck_content.pushObject(App.Card.create({"name":"dragongate","desc":"Dragon Gate. This is a sign of prestige - the kingdom has not seen a dragon in over 1000 years. It costs 6 gold to build, but it's worth 8 points at the end of the game.","color":"purple","pic":"dragongate.jpg","cost":6}));
 		deck_content.pushObject(App.Card.create({"name":"university","desc":"University. This is a sign of prestige - nobody ever understood what it's for. It costs 6 gold to build, but it's worth 8 points at the end of the game.","color":"purple","pic":"university.jpg","cost":6}));
 		if (!this.inExtended(8)) deck_content.pushObject(App.Card.create({"name":"graveyard","desc":"Graveyard. When the Warlord destroys a District, you may pay a gold piece to take the destroyed District into your hand. You cannot do this if you are the Warlord.","color":"purple","pic":"graveyard.jpg","cost":5}));
-		//deck_content.pushObject(App.Card.create({"name":"lighthouse","desc":"Lighthouse. When you play the lighthouse in your city, look through the district cards deck, choose one card and place it in your hand, then reshuffle the deck.","color":"purple","pic":"lighthouse.jpg","cost":3}));
+		//deck_content.pushObject(App.Card.create({"name":"armory","desc":"Powderhouse. During your turn, you can destroy the powderhouse and destroy another district card of your choice in any player's city.","color":"purple","pic":"armory.jpg","cost":3}));
 	},
 	extended_deck : [
 		{"name":"lighthouse","desc":"Lighthouse. When you play the lighthouse in your city, look through the district cards deck, choose one card and place it in your hand, then reshuffle the deck.","color":"purple","pic":"lighthouse.jpg","cost":3},
