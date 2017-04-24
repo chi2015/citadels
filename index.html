@@ -80,9 +80,14 @@
 						<button {{action 'takeCoins'}}>Take 2 coins</button>
 						<button {{action 'chooseCards'}}>Choose cards</button>
 					{{/unless}}
+					{{#if model.player1.hasWorkshop}}
+						{{#unless model.currentCharacter.used_workshop}}
+							<button {{action 'useWorkshop'}}>Pay 2 coins for 3 cards</button>
+						{{/unless}}
+					{{/if}}
 					{{#if model.currentCharacter.isMagician}}
 						{{#unless model.currentCharacter.did_magic}}
-						<button {{action 'doMagic'}}>Do magic</button>
+							<div class="magic-buttons"><button {{action 'exchangeCards'}}>Exchange cards</button> or <button {{action 'chooseToDiscard'}}>Discard cards</button></div>
 						{{/unless}}
 					{{/if}}
 					{{#if model.currentCharacter.isColor}}
@@ -100,7 +105,11 @@
 							{{#if model.currentCharacter.can_build}}
 								<p>Click to one of your cards to build</p>
 							{{/if}}
-							<button {{action 'endTurn'}}>End turn</button>
+							{{#unless model.deck.card_on_graveyard}}
+								{{#unless model.currentCharacter.choosed_to_discard}}
+									<button {{action 'endTurn'}}>End turn</button>
+								{{/unless}}
+							{{/unless}}
 						{{/unless}}
 					{{/if}}
 				</div>
@@ -116,13 +125,51 @@
 					{{/if}}
 			{{/if}}
 		{{/if}}
+		{{#if model.player1.hasGraveyard}}
+			{{#if model.deck.card_on_graveyard}}
+				{{#if model.player1.coins}}
+					<p>Do you want to pay 1 coin for taking this card?</p>
+					<img src="districts/{{model.deck.card_on_graveyard.pic}}"/>
+					<button {{action 'yesGraveyard'}}>Yes</button>
+					<button {{action 'noGraveyard'}}>No</button>
+				{{/if}}
+			{{/if}}
+		{{/if}}
 		<div class="districts-block">
-			<p>Your cards:</p>
+				<p>Your cards:</p>
+			{{#if model.youActivePlayer }}	
+			{{#if model.currentCharacter.choosed_to_discard }}
+				<p>Choose cards to discard</p>
+			{{/if}}
+			{{/if}}
 			<div class="cards-list">
 				{{#each model.player1.cards as |card|}}
-					<img {{action 'build' card}} src="districts/{{card.pic}}"/>
+					<div class="card-block">
+						{{#if model.youActivePlayer}}
+							{{#if model.currentCharacter.choosed_to_discard }}
+								{{input type="checkbox" name="isChecked" checked=card.isChecked}}
+							{{/if}}
+						{{/if}}
+						{{#unless model.currentCharacter.choosed_to_discard }}
+							{{#if model.youActivePlayer}}
+								{{#if model.phazeIsAction }}
+									{{#if model.player1.hasLab }}
+										{{#unless model.currentCharacter.used_lab}}
+											<button {{action 'toLab' card}}>Lab</button>
+										{{/unless}}
+									{{/if}}
+								{{/if}}
+							{{/if}}
+						{{/unless}} 
+						<img {{action 'build' card}} src="districts/{{card.pic}}"/>
+					</div>
 				{{/each}}
 			</div>
+			{{#if model.youActivePlayer}}
+				{{#if model.currentCharacter.choosed_to_discard }}
+					<button {{action 'discardCards'}} class="discard-button">Discard</button>
+				{{/if}}
+			{{/if}}
 		</div>
 		<div class="board board-1">
 			<div class="profile">
@@ -159,7 +206,7 @@
 				</div>
 			</div>
 			<div class="districts">
-				<div class="cards-list">
+				<div class="cards-list districts-list">
 					{{#each model.player1.districts as |district|}}
 						<img {{action "destroy" district}} src="districts/{{district.pic}}"/>
 					{{/each}}
@@ -202,7 +249,7 @@
 				</div>
 			</div>
 			<div class="districts">
-				<div class="cards-list">
+				<div class="cards-list districts-list">
 					{{#each model.player2.districts as |district|}}
 						<img {{action "destroy" district}} src="districts/{{district.pic}}"/>
 					{{/each}}
@@ -211,12 +258,50 @@
 			</div>
 		</div>
 		<div class="districts-block">
-			<p>Robot cards:</p>
+			{{#if model.player2.hasGraveyard}}
+				{{#if model.deck.card_on_graveyard}}
+					{{#if model.player2.coins}}
+						<p>Do you want to pay 1 coin for taking this card?</p>
+						<img src="districts/{{model.deck.card_on_graveyard.pic}}"/>
+						<button {{action 'yesGraveyard'}}>Yes</button>
+						<button {{action 'noGraveyard'}}>No</button>
+					{{/if}}
+				{{/if}}
+			{{/if}}
+				<p>Robot cards:</p>
+				{{#if model.robotActivePlayer}}
+			{{#if model.currentCharacter.choosed_to_discard }}
+				<p>Choose cards to discard</p>
+			{{/if}}
+			{{/if}}
 			<div class="cards-list">
 				{{#each model.player2.cards as |card|}}
-					<img {{action 'build' card}} src="districts/{{card.pic}}"/>
+					<div class="card-block">
+						{{#if model.robotActivePlayer}}
+							{{#if model.currentCharacter.choosed_to_discard }}
+								{{input type="checkbox" name="isChecked" checked=card.isChecked}}
+							{{/if}}
+						{{/if}}
+						{{#unless model.currentCharacter.choosed_to_discard }}
+							{{#if model.robotActivePlayer}}
+								{{#if model.phazeIsAction }}
+									{{#if model.player2.hasLab }}
+										{{#unless model.currentCharacter.used_lab}}
+											<button {{action 'toLab' card}}>Lab</button>
+										{{/unless}}
+									{{/if}}
+								{{/if}}
+							{{/if}}
+						{{/unless}} 
+						<img {{action 'build' card}} src="districts/{{card.pic}}"/>
+					</div>
 				{{/each}}
 			</div>
+			{{#if model.robotActivePlayer}}
+				{{#if model.currentCharacter.choosed_to_discard }}
+					<button {{action 'discardCards'}} class="discard-button">Discard</button>
+				{{/if}}
+			{{/if}}
 		</div>
 		{{#if model.robotActivePlayer}}
 			{{#if model.phazeIsChoose }}
@@ -277,9 +362,14 @@
 						<button {{action 'takeCoins'}}>Take 2 coins</button>
 						<button {{action 'chooseCards'}}>Choose cards</button>
 					{{/unless}}
+					{{#if model.player2.hasWorkshop}}
+						{{#unless model.currentCharacter.used_workshop}}
+							<button {{action 'useWorkshop'}}>Pay 2 coins for 3 cards</button>
+						{{/unless}}
+					{{/if}}
 					{{#if model.currentCharacter.isMagician}}
 						{{#unless model.currentCharacter.did_magic}}
-								<button {{action 'doMagic'}}>Do magic</button>
+						<div class="magic-buttons"><button {{action 'exchangeCards'}}>Exchange cards</button> or <button {{action 'chooseToDiscard'}}>Discard cards</button></div>
 						{{/unless}}
 					{{/if}}
 					{{#if model.currentCharacter.isColor}}
@@ -297,7 +387,11 @@
 							{{#if model.currentCharacter.can_build}}
 								<p>Click to one of your cards to build</p>
 							{{/if}}
-							<button {{action 'endTurn'}}>End turn</button>
+							{{#unless model.deck.card_on_graveyard}}
+								{{#unless model.currentCharacter.choosed_to_discard}}
+									<button {{action 'endTurn'}}>End turn</button>
+								{{/unless}}
+							{{/unless}}
 						{{/unless}}
 					{{/if}}
 				</div>
