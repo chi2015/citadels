@@ -8,9 +8,13 @@ App.Card = Ember.Object.extend({
 	onChoose : function() {
 		return this.get('status') == 'on_choice';
 	}.property('status'),
+	init() {
+		if (!this.get('desc')) this.set('desc', this.get('name'));
+	},
 	serialize : function() {
 		return {
 			"name" : this.get('name'),
+			"desc" : this.get('desc'),
 			"color" : this.get('color'),
 			"pic" : this.get('pic'),
 			"cost" : this.get('cost'),
@@ -58,68 +62,68 @@ App.Deck = Ember.Object.extend({
 	initDefaultDeck : function() {
 		var deck_content = this.get('content');
 		for (i=0; i<5; i++) 
-			deck_content.pushObject(App.Card.create({"name":"domain","color":"yellow","pic":"domain.jpg","cost":3}));
+			deck_content.pushObject(App.Card.create({"name":"domain","desc":"Manor","color":"yellow","pic":"domain.jpg","cost":3}));
 		for (i=0; i<4; i++) 
-			deck_content.pushObject(App.Card.create({"name":"castle","color":"yellow","pic":"castle.jpg","cost":4}));
+			deck_content.pushObject(App.Card.create({"name":"castle","desc":"Castle","color":"yellow","pic":"castle.jpg","cost":4}));
 		for (i=0; i<3; i++) 
-			deck_content.pushObject(App.Card.create({"name":"palace","color":"yellow","pic":"palace.jpg","cost":5}));
+			deck_content.pushObject(App.Card.create({"name":"palace","desc":"Palace","color":"yellow","pic":"palace.jpg","cost":5}));
 		for (i=0; i<3; i++) 
-			deck_content.pushObject(App.Card.create({"name":"temple","color":"blue","pic":"temple.jpg","cost":1}));
+			deck_content.pushObject(App.Card.create({"name":"temple","desc":"Temple","color":"blue","pic":"temple.jpg","cost":1}));
 		for (i=0; i<3; i++) 
-			deck_content.pushObject(App.Card.create({"name":"church","color":"blue","pic":"church.jpg","cost":2}));
+			deck_content.pushObject(App.Card.create({"name":"church","desc":"Church","color":"blue","pic":"church.jpg","cost":2}));
 		for (i=0; i<3; i++) 
-			deck_content.pushObject(App.Card.create({"name":"monastery","color":"blue","pic":"monastery.jpg","cost":3}))
+			deck_content.pushObject(App.Card.create({"name":"monastery","desc":"Monastery","color":"blue","pic":"monastery.jpg","cost":3}))
 		for (i=0; i<2; i++) 
-			deck_content.pushObject(App.Card.create({"name":"cathedral","color":"blue","pic":"cathedral.jpg","cost":5}));
+			deck_content.pushObject(App.Card.create({"name":"cathedral","desc":"Cathedral","color":"blue","pic":"cathedral.jpg","cost":5}));
 		for (i=0; i<5; i++) 
-			deck_content.pushObject(App.Card.create({"name":"tavern","color":"green","pic":"tavern.jpg","cost":1}));
+			deck_content.pushObject(App.Card.create({"name":"tavern","desc":"Tavern","color":"green","pic":"tavern.jpg","cost":1}));
 		for (i=0; i<3; i++) 
-			deck_content.pushObject(App.Card.create({"name":"store","color":"green","pic":"store.jpg","cost":2}));	
+			deck_content.pushObject(App.Card.create({"name":"store","desc":"Trading Post","color":"green","pic":"store.jpg","cost":2}));	
 		for (i=0; i<4; i++) 
-			deck_content.pushObject(App.Card.create({"name":"market","color":"green","pic":"market.jpg","cost":2}));
+			deck_content.pushObject(App.Card.create({"name":"market","desc":"Market","color":"green","pic":"market.jpg","cost":2}));
 		for (i=0; i<3; i++) 
-			deck_content.pushObject(App.Card.create({"name":"warehouse","color":"green","pic":"warehouse.jpg","cost":3}));
+			deck_content.pushObject(App.Card.create({"name":"warehouse","desc":"Docks","color":"green","pic":"warehouse.jpg","cost":3}));
 		for (i=0; i<3; i++) 
-			deck_content.pushObject(App.Card.create({"name":"harbour","color":"green","pic":"harbour.jpg","cost":4}));	
+			deck_content.pushObject(App.Card.create({"name":"harbour","desc":"Harbor","color":"green","pic":"harbour.jpg","cost":4}));	
 		for (i=0; i<2; i++) 
-			deck_content.pushObject(App.Card.create({"name":"townhall","color":"green","pic":"townhall.jpg","cost":5}));
+			deck_content.pushObject(App.Card.create({"name":"townhall","desc":"Town Hall","color":"green","pic":"townhall.jpg","cost":5}));
 		for (i=0; i<3; i++) 
-			deck_content.pushObject(App.Card.create({"name":"watchtower","color":"red","pic":"watchtower.jpg","cost":1}));	
+			deck_content.pushObject(App.Card.create({"name":"watchtower","desc":"Watchtower","color":"red","pic":"watchtower.jpg","cost":1}));	
 		for (i=0; i<3; i++) 
-			deck_content.pushObject(App.Card.create({"name":"prison","color":"red","pic":"prison.jpg","cost":2}));
+			deck_content.pushObject(App.Card.create({"name":"prison","desc":"Prison","color":"red","pic":"prison.jpg","cost":2}));
 		for (i=0; i<3; i++) 
-			deck_content.pushObject(App.Card.create({"name":"barracks","color":"red","pic":"barracks.jpg","cost":3}));	
+			deck_content.pushObject(App.Card.create({"name":"barracks","desc":"Battlefield","color":"red","pic":"barracks.jpg","cost":3}));	
 		for (i=0; i<2; i++) 
-			deck_content.pushObject(App.Card.create({"name":"fortress","color":"red","pic":"fortress.jpg","cost":5}));
+			deck_content.pushObject(App.Card.create({"name":"fortress","desc":"Fortress","color":"red","pic":"fortress.jpg","cost":5}));
 		for (i=0; i<2; i++) 
-			deck_content.pushObject(App.Card.create({"name":"keep","color":"purple","pic":"keep.jpg","cost":3}));
+			deck_content.pushObject(App.Card.create({"name":"keep","desc":"Keep. The Keep cannot be destroyed by the Warlord.","color":"purple","pic":"keep.jpg","cost":3}));
 			
-		deck_content.pushObject(App.Card.create({"name":"city","color":"city","pic":"city.jpg","cost":2}));
-		deck_content.pushObject(App.Card.create({"name":"observatory","color":"purple","pic":"observatory.jpg","cost":5}));
-		deck_content.pushObject(App.Card.create({"name":"lab","color":"purple","pic":"lab.jpg","cost":5}));
-		deck_content.pushObject(App.Card.create({"name":"workshop","color":"purple","pic":"workshop.jpg","cost":5}));
-		deck_content.pushObject(App.Card.create({"name":"library","color":"purple","pic":"library.jpg","cost":6}));
-		deck_content.pushObject(App.Card.create({"name":"school","color":"purple","pic":"school.jpg","cost":6}));
-		deck_content.pushObject(App.Card.create({"name":"greatwall","color":"purple","pic":"greatwall.jpg","cost":6}));
-		deck_content.pushObject(App.Card.create({"name":"dragongate","color":"purple","pic":"dragongate.jpg","cost":6}));
-		deck_content.pushObject(App.Card.create({"name":"university","color":"purple","pic":"university.jpg","cost":6}));
-		if (!this.inExtended(8)) deck_content.pushObject(App.Card.create({"name":"graveyard","color":"purple","pic":"graveyard.jpg","cost":5}));
+		deck_content.pushObject(App.Card.create({"name":"city","desc":"Miracle Courtyard. At the end of the game, the Miracle Courtyard counts as a colour of your choice.","color":"city","pic":"city.jpg","cost":2}));
+		deck_content.pushObject(App.Card.create({"name":"observatory","desc":"Observatory. If you choose to draw cards at the begining of your turn, you may pick three cards, keep one of your choice and place the two others at the bottom the deck.","color":"purple","pic":"observatory.jpg","cost":5}));
+		deck_content.pushObject(App.Card.create({"name":"lab","desc":"Laboratory. Once per turn, you may discard a District card from your hand and get a gold piece in return.","color":"purple","pic":"lab.jpg","cost":5}));
+		deck_content.pushObject(App.Card.create({"name":"workshop","desc":"Workshop. Once per turn, you may pay 3 gold to draw 3 cards.","color":"purple","pic":"workshop.jpg","cost":5}));
+		deck_content.pushObject(App.Card.create({"name":"library","desc":"Library. If you choose to draw cards at the begining of your turn, you keep the two cards you have drawn.","color":"purple","pic":"library.jpg","cost":6}));
+		deck_content.pushObject(App.Card.create({"name":"school","desc":"School of Magic. For the purposes of income, the School of Magic is considered to be the colour of your choice.","color":"purple","pic":"school.jpg","cost":6}));
+		deck_content.pushObject(App.Card.create({"name":"greatwall","desc":"Great Wall. The cost to swap or destroy your Districts is increased by one.","color":"purple","pic":"greatwall.jpg","cost":6}));
+		deck_content.pushObject(App.Card.create({"name":"dragongate","desc":"Dragon Gate. This is a sign of prestige - the kingdom has not seen a dragon in over 1000 years. It costs 6 gold to build, but it's worth 8 points at the end of the game.","color":"purple","pic":"dragongate.jpg","cost":6}));
+		deck_content.pushObject(App.Card.create({"name":"university","desc":"University. This is a sign of prestige - nobody ever understood what it's for. It costs 6 gold to build, but it's worth 8 points at the end of the game.","color":"purple","pic":"university.jpg","cost":6}));
+		if (!this.inExtended(8)) deck_content.pushObject(App.Card.create({"name":"graveyard","desc":"Graveyard. When the Warlord destroys a District, you may pay a gold piece to take the destroyed District into your hand. You cannot do this if you are the Warlord.","color":"purple","pic":"graveyard.jpg","cost":5}));
 	},
 	extended_deck : [
-		{"name":"lighthouse","color":"purple","pic":"lighthouse.jpg","cost":3},
-		{"name":"museum","color":"purple","pic":"museum.jpg","cost":4},
-		{"name":"poorhouse","color":"purple","pic":"poorhouse.jpg","cost":4},
-		{"name":"belltower","color":"purple","pic":"belltower.jpg","cost":5},
-		{"name":"factory","color":"purple","pic":"factory.jpg","cost":5},
-		{"name":"quarry","color":"purple","pic":"quarry.jpg","cost":5},
-		{"name":"fountain","color":"purple","pic":"fountain.jpg","cost":5},
-		{"name":"ballroom","color":"purple","pic":"ballroom.jpg","cost":6},
-		{"name":"park","color":"purple","pic":"park.jpg","cost":6},
-		{"name":"hospital","color":"purple","pic":"hospital.jpg","cost":6},
-		{"name":"throneroom","color":"purple","pic":"throneroom.jpg","cost":6},
-		{"name":"armory","color":"purple","pic":"armory.jpg","cost":3},
-		{"name":"treasury","color":"purple","pic":"treasury.jpg","cost":4},
-		{"name":"maproom","color":"purple","pic":"maproom.jpg","cost":5}
+		{"name":"lighthouse","desc":"Lighthouse. When you play the lighthouse in your city, look through the district cards deck, choose one card and place it in your hand, then reshuffle the deck.","color":"purple","pic":"lighthouse.jpg","cost":3},
+		{"name":"museum","desc":"Museum. On your turn, you may place one district card from your hand, face down, under the Museum. At the end of the game, you score 1 extra victory point for each card under the Museum.","color":"purple","pic":"museum.jpg","cost":4},
+		{"name":"poorhouse","desc":"Poorhouse. If you have no gold at the end of your turn, get 1 gold from the bank.","color":"purple","pic":"poorhouse.jpg","cost":4},
+		{"name":"belltower","desc":"Tower Bell. When you play the Tower Bell in your city, you may shorten the game and decide that it will end at the end of the turn in which a player builds one less district than the specified in the game. You can do this even if the Tower Bell is your last district. If the Tower bell is later destroyed by the Warlord, end conditions go back to normal.","color":"purple","pic":"belltower.jpg","cost":5},
+		{"name":"factory","desc":"Factory. The building cost for any other purple building you build in your city is reduced by one. This doesn´t affect the price paid by the Warlord to destroy it.","color":"purple","pic":"factory.jpg","cost":5},
+		{"name":"quarry","desc":"Quarry. Allows you to build Districts named as others you've already built.","color":"purple","pic":"quarry.jpg","cost":5},
+		{"name":"fountain","desc":"Fountain of Wishes. At the end of the game, the Fountain of Wishes gives you 5 points, plus one more for every other purple District you have built.","color":"purple","pic":"fountain.jpg","cost":5},
+		{"name":"ballroom","desc":"Ball room. When you have the crown, all other players must say 'Thanks, your Excellency' after you call his character. If a player forgets and starts his turn without saying it, he loses his turn.","color":"purple","pic":"ballroom.jpg","cost":6},
+		{"name":"park","desc":"Park. If you have no card in hand at the end of your turn, draw two cards from the drawing pile.","color":"purple","pic":"park.jpg","cost":6},
+		{"name":"hospital","desc":"Hospital. If you are assassinated, you still take two gold or draw two cards and discard one when comes your turn, but that's all you do this turn.","color":"purple","pic":"hospital.jpg","cost":6},
+		{"name":"throneroom","desc":"Throne Hall. Every time the crown moves from a player to another, you receive 1 gold from the bank.","color":"purple","pic":"throneroom.jpg","cost":6},
+		{"name":"armory","desc":"Powderhouse. During your turn, you can destroy the powderhouse and destroy another district card of your choice in any player's city.","color":"purple","pic":"armory.jpg","cost":3},
+		{"name":"treasury","desc":"Imperial Treasury. At the end of the game, you score 1 victory point bonus for each coin in your hand.","color":"purple","pic":"treasury.jpg","cost":4},
+		{"name":"maproom","desc":"Map Room. At the end of the game, you score 1 victory point bonus for each card in your hand.","color":"purple","pic":"maproom.jpg","cost":5}
 	],
 	initExtendedDeck : function() {
 		/*for test 
@@ -136,12 +140,13 @@ App.Deck = Ember.Object.extend({
 			{
 				n = Math.floor(Math.random() * extended_deck.length);
 				if (!deck_content.findBy('name', extended_deck[n]["name"]))
-				{
-					chosen = true;
-					deck_content.pushObject(App.Card.create(extended_deck[n]));
-					console.log(extended_deck[n]["name"]);
-				}
+					if (extended_deck[n]["name"]!="hospital" || !this.inExtended(1))
+					{
+						chosen = true;
+						deck_content.pushObject(App.Card.create(extended_deck[n]));
+					}
 			}
+			console.log(extended_deck[n]["name"]);
 		}
 	}
 });
@@ -409,6 +414,7 @@ App.Character = Ember.Object.extend({
 
 App.Assasin = App.Character.extend({
 	name : "Assasin",
+	desc: "Assassin. May select a character to Assassinate. That character loses their turn.",
 	isAssasin : true,
 	number : 1,
 	pic: "character1.jpg",
@@ -433,6 +439,7 @@ App.Assasin = App.Character.extend({
 
 App.Thief = App.Character.extend({
 	name: "Thief",
+	desc: "Thief. May select a character to steal from. At the start of their turn, the Thief takes their gold.",
 	isThief: true,
 	pic: "character2.jpg",
 	number: 2,
@@ -457,6 +464,7 @@ App.Thief = App.Character.extend({
 
 App.Magician = App.Character.extend({
 	name: "Magician",
+	desc: "Magician. May either exchange hands with another player, or swap cards in his hand for cards from the deck.",
 	isMagician: true,
 	pic: "character3.jpg",
 	number: 3,
@@ -549,6 +557,7 @@ App.ColourCharacter = App.Character.extend({
 
 App.King = App.ColourCharacter.extend({
 	name: "King",
+	desc: "King. Receives income for Noble (yellow) Districts. Also gets first choice of characters during the next turn.",
 	number: 4,
 	color: "yellow",
 	pic: "character4.jpg",
@@ -572,6 +581,7 @@ App.King = App.ColourCharacter.extend({
 
 App.Bishop = App.ColourCharacter.extend({
 	name: "Bishop",
+	desc: "Bishop. Receives income from Religious (blue) Districts. His Buildings cannot be Destroyed by the Warlord or swapped by the Diplomat.",
 	number: 5,
 	color: "blue",
 	pic: "character5.jpg"
@@ -579,6 +589,7 @@ App.Bishop = App.ColourCharacter.extend({
 
 App.Merchant = App.ColourCharacter.extend({
 	name: "Merchant",
+	desc: "Merchant. Receives income from Trade (green) Districts. Also receives one gold at the start of his turn.",
 	number: 6,
 	color: "green",
 	pic: "character6.jpg",
@@ -596,6 +607,7 @@ App.Merchant = App.ColourCharacter.extend({
 
 App.Architect = App.Character.extend({
 	name: "Architect",
+	desc: "Architect. Receives 2 additional cards when he takes his 2 gold or 1 card. Can build up to 3 Districts per turn.",
 	number: 7,
 	pic: "character7.jpg",
 	max_build : 3,
@@ -616,6 +628,7 @@ App.Architect = App.Character.extend({
 
 App.Warlord = App.ColourCharacter.extend({
 	name: "Warlord",
+	desc: "Warlord. Receives income from Military (red) Districts. At the end of his turn, he may destroy a District for the cost of that District -1 gold.",
 	isWarlord: true,
 	number: 8,
 	pic: "character8.jpg",
@@ -672,6 +685,7 @@ App.Warlord = App.ColourCharacter.extend({
 
 App.Witch = App.Character.extend({
 	name : "Witch",
+	desc : "Witch. Can Bewitch a character of her choice, playing part of her turn with the chosen character skills.",
 	isWitch : true,
 	number : 1,
 	pic : "character11.jpg",
@@ -696,6 +710,7 @@ App.Witch = App.Character.extend({
 
 App.TaxCollector = App.Character.extend({
 	name : "Tax",
+	desc : "Tax Collector. Each other player that builds at least one District in her turn, gives one gold to the Tax Collector.",
 	number : 2,
 	pic : "character12.jpg"
 });
@@ -703,6 +718,7 @@ App.TaxCollector = App.Character.extend({
 App.Wizard = App.Character.extend({
 	name: "Wizard",
 	number : 3,
+	desc: "Wizard. Can choose a card from the hand of another player. Then, he can choose to put in his hand or to build it, regardless of the normal building in this turn.",
 	pic: "character13.jpg",
 	isWizard : true,
 	stole : false,
@@ -760,6 +776,7 @@ App.Wizard = App.Character.extend({
 
 App.Emperor = App.ColourCharacter.extend({
 	name: "Emperor",
+	desc: "Emperor. Receives income from Noble (gold) Districts. You must give the Crown to another player, who has to pay you a gold piece or a card (your choice).",
 	number: 4,
 	color: "yellow",
 	pic: "character14.jpg",
@@ -795,6 +812,7 @@ App.Emperor = App.ColourCharacter.extend({
 
 App.Abbot = App.ColourCharacter.extend({
 	name: "Abbot",
+	desc: "Abbot. Receives income from Religious (blue) Districts. The most rich player must give him a gold piece.",
 	number: 5,
 	color: "blue",
 	pic: "character15.jpg",
@@ -825,6 +843,7 @@ App.Abbot = App.ColourCharacter.extend({
 
 App.Alchemist = App.Character.extend({
 	name: "Alchemist",
+	desc: "Alchemist. He receives the total cost of a District after building it.",
 	number: 6,
 	pic: "character16.jpg",
 	build : function(game, card) {
@@ -838,6 +857,7 @@ App.Alchemist = App.Character.extend({
 
 App.Navigator = App.Character.extend({
 	name: "Navigator",
+	desc: "Navigator. You can take 4 gold or 4 cards. You cannot build.",
 	isNavigator: true,
 	number: 7,
 	max_build: 0,
@@ -866,6 +886,7 @@ App.Navigator = App.Character.extend({
 
 App.Diplomat = App.ColourCharacter.extend({
 	name: "Diplomat",
+	desc: "Diplomat. Receives income from Military (red) Districts. He can swap a Distritct he owns for one of other player's (except the Bishop), paying them the difference.",
 	isDiplomat: true,
 	number: 8,
 	color: "red",
@@ -1194,6 +1215,7 @@ App.Game = Ember.Object.extend({
 	currentCharacter : null,
 	first_full_city : false,
 	winner : "",
+	is_extended : false,
 	extended : [],
 	setWinner : function() {
 		var winner;
@@ -1213,7 +1235,6 @@ App.Game = Ember.Object.extend({
 			
 			this.set('name',name);
 			this.set('extended', extended);
-			
 			var player1 = App.Player.create({ name :  player1_name, districts : [], characters : [], cards : []});
 			var player2 = App.Player.create({ name :  player2_name, is_robot : true, districts : [], characters : [], cards : []});
 			this.set('player1', player1);
@@ -1260,7 +1281,7 @@ App.Game = Ember.Object.extend({
 		});
 	},
 	save : function() {
-		if (this.get('phaze') == 'choose' || this.get('phaze') == 'action')
+		if (this.get('phaze') == 'choose' || this.get('phaze') == 'discard' || this.get('phaze') == 'action')
 			localStorage.setItem('game', JSON.stringify(this.serialize()));
 	},
 	load : function(gameData) {
@@ -1495,168 +1516,166 @@ App.IndexRoute = Ember.Route.extend({
   game : null,
   actions : {
   		start : function(gameName, yourName, robotName) {
-
-  		   var game_type = $('input[name="game_type"]:checked').val();
   		   var extended = [];
-  		   if (game_type == 'extended') {
-  		   	 var gen_arr = [1,2,3,4,5,6,7,8];
-  		   	 extended = extended.concat(gen_arr.splice(Math.floor(Math.random() * gen_arr.length), 1))
-  		   	         .concat(gen_arr.splice(Math.floor(Math.random() * gen_arr.length), 1));
+  		   var cb_ext_arr = $('input[id^="cb_ext_"]:checked');
+  		   
+  		   if (this.get('game').get('is_extended') && !cb_ext_arr.length)
+  		   {
+  		   		this.get('game').showError('You should choose at least one extended character');
+  		   		return;
   		   }
+  		   
+  		   var names_arr = {'Game name' : gameName, 'Your name' : yourName, 'Robot name' : robotName};
+  		   
+  		   for (var key in names_arr)
+			   if (names_arr[key] && !names_arr[key].match('^[0-9A-Za-z_]+$'))
+			   {
+					this.get('game').showError(key+' can contain only the characters: 0-9, A-Z, a-z, _');
+					return;
+			   }
+			   
+		   if (yourName && robotName && yourName == robotName) {
+			   this.get('game').showError('Your name and robot name should not be the same');
+  		   		return;
+		   } 
+			
+  		   for (var j=0; j<cb_ext_arr.length; j++)
+					extended.push(parseInt(cb_ext_arr.eq(j).attr('id').substring(7)));
 
   		   this.get('game').start(gameName || "New Game", yourName || "Human", robotName || "Robot", extended);
   		},
-  		finish : function() {
-  			this.get('game').finish();
+  		setExtended : function() {
+  			this.get('game').set('is_extended', $('input[name="game_type"]:checked').val() == 'extended');
   		},
-  		restart : function() {
-  			this.get('game').restart();
+  		randomExtended : function() {
+			var gen_arr = [1,2,3,4,5,6,7,8];
+			var ext_cnt = Math.floor(Math.random() * gen_arr.length);
+			for (var i=0; i<ext_cnt; i++) gen_arr.splice(Math.floor(Math.random() * gen_arr.length), 1);
+			$('input[id^="cb_ext_"]').prop('checked', false);
+			for (var j=0; j<gen_arr.length; j++) {
+				$('#cb_ext_'+gen_arr[j]).prop('checked', true);	
+			}
+		},
+  		finish : function(game) {
+  			game.finish();
   		},
-		takeCharacter : function(character) {
-			var game = this.get('game');
-			game.get('activePlayer').takeCharacter(character);
+  		restart : function(game) {
+  			game.restart();
+  		},
+		takeCharacter : function(game, player, character) {
+			player.takeCharacter(character);
 			game.changePhaze();
 		},
-		discardCharacter : function(character) {
-			var game = this.get('game');
-			game.get('activePlayer').discardCharacter(character);
+		discardCharacter : function(game, player, character) {
+			player.discardCharacter(character);
 			game.changePhaze();
 		},
-		takeCoins : function() {
-			var game = this.get('game');
-			var character = game.get('currentCharacter');
+		takeCoins : function(game, character) {
 			character.takeCoins(game);
 		},
-		chooseCards : function() {
-			var game = this.get('game');
-			var character = game.get('currentCharacter');
+		chooseCards : function(game, character) {
 			character.chooseCard(game);
 		},
-		takeCard : function(card) {
-			var game = this.get('game');
-			var character = game.get('currentCharacter');
+		takeCard : function(game, character, card) {
 			character.takeCard(game, card);
 		},
-		build : function(card) {
-			var game = this.get('game');
-			var character = game.get('currentCharacter');
+		build : function(game, character, card) {
 			if (character.get('choosed_to_discard')) return;
 			if (character) character.build(game, card);
 		},
-		endTurn : function() {
-			this.get('game').get('currentCharacter').endTurn(this.get('game'));
+		endTurn : function(game, character) {
+			character.endTurn(game);
 		},
-		assasinateCharacter : function(character)
+		assasinateCharacter : function(assasin, character)
 		{
-			var game = this.get('game');
-			this.get('game').get('currentCharacter').assasinate(character);
+			assasin.assasinate(character);
 		},
-		bewitchCharacter : function(character)
+		bewitchCharacter : function(witch, character)
 		{
-			var game = this.get('game');
-			this.get('game').get('currentCharacter').bewitch(character);
+			witch.bewitch(character);
 		},
-		robCharacter : function(character)
+		robCharacter : function(robber, character)
 		{
-			var game = this.get('game');
-			this.get('game').get('currentCharacter').rob(character);
+			robber.rob(character);
 		},
-		exchangeCards : function()
+		exchangeCards : function(game, character, player)
 		{
-			var game = this.get('game');
-			var character = game.get('currentCharacter');
-			var player = game.get('activePlayer') === game.get('player2') ? game.get('player1') : game.get('player2');
 			character.exchange_cards(game, player);
 		},
-		chooseToDiscard : function()
+		chooseToDiscard : function(character)
 		{
-			var game = this.get('game');
-			var character = game.get('currentCharacter');
 			character.chooseToDiscard();
 		},
-		discardCards : function() {
-			var game = this.get('game');
-			var character = game.get('currentCharacter');
+		discardCards : function(game, character) {
 			character.discardCards(game);
 		},
-		stealCard : function(card) {
-			var game = this.get('game');
-			var character = game.get('currentCharacter');
-			var player = game.get('activePlayer') === game.get('player2') ? game.get('player1') : game.get('player2');
+		stealCard : function(character, player, card) {
 			character.stealCard(player, card);
 		},
-		wizardBuild : function(card) {
-			var game = this.get('game');
-			var character = game.get('currentCharacter');
+		wizardBuild : function(game, character, card) {
 			character.wizardBuild(game, card);
 		},
-		coronate : function(player) {
-			this.get('game').get('currentCharacter').coronate(this.get('game'), player);
+		coronate : function(game, character, player) {
+			character.coronate(game, player);
 		},
-		giveCoinForCrown : function(player) {
-			player.giveCoinForCrown(this.get('game'));
+		giveCoinForCrown : function(game, player) {
+			player.giveCoinForCrown(game);
 		},
-		giveCardForCrown : function(player) {
-			player.giveCardForCrown(this.get('game'));
+		giveCardForCrown : function(game, player) {
+			player.giveCardForCrown(game);
 		},
-		take4Coins : function() {
-			this.get('game').get('currentCharacter').take4Coins();
+		take4Coins : function(character) {
+			character.take4Coins();
 		},
-		take4Cards : function() {
-			this.get('game').get('currentCharacter').take4Cards(this.get('game'));
+		take4Cards : function(game, character) {
+			character.take4Cards(game);
 		},
-		takeIncome : function()
-		{
-			this.get('game').get('currentCharacter').takeIncome();
+		takeIncome : function(character) {
+			character.takeIncome();
 		},
-		destroyOrSwap : function(district) {
-			var game = this.get('game');
+		destroy : function(game, character, player_to, district) {
+			if (player_to === game.get('activePlayer')) return;
+			if (game.get('activePlayer') === game.get('player1') && game.get('player1Blocked')) return;
+			if (game.get('activePlayer') === game.get('player2') && game.get('player2Blocked')) return;
+			if (character && character.get('isWarlord')) character.destroy(game, player_to, district);
+		},
+		swap : function(game, character, district) {
 			var player_to = game.get('activePlayer') === game.get('player2') ? game.get('player1') : game.get('player2');
 			if (game.get('activePlayer') === game.get('player1') && game.get('player1Blocked')) return;
 			if (game.get('activePlayer') === game.get('player2') && game.get('player2Blocked')) return;
-			var character = game.get('currentCharacter');
-			if (character && character.get('isWarlord')) character.destroy(game, player_to, district);
 			if (character && character.get('isDiplomat')) character.swap(game, player_to, district);
 		},
-		useWorkshop : function() {
-			var game = this.get('game');
-			var character = game.get('currentCharacter');
+		useWorkshop : function(game, character) {
 			character.useWorkshop(game);
 		},
-		toLab : function(card) {
-			var character = this.get('game').get('currentCharacter');
+		toLab : function(character, card) {
 			character.useLab(card);
 		},
-		toMuseum : function(card) {
-			var character = this.get('game').get('currentCharacter');
-			character.underMuseum(this.get('game'), card);
+		toMuseum : function(game, character, card) {
+			character.underMuseum(game, card);
 		},
-		ringTheBell : function() {
-			this.get('game').get('activePlayer').ringTheBell(this.get('game'));
+		ringTheBell : function(game, player) {
+			player.ringTheBell(game);
 		},
-		onExplode : function() {
-			this.get('game').get('activePlayer').onExplode();
+		onExplode : function(player) {
+			player.onExplode();
 		},
-		explode : function(district) {
-			this.get('game').get('activePlayer').explodeArmory(this.get('game'), district);
+		explode : function(game, player, district) {
+			player.explodeArmory(game, district);
 		},
-		useLighthouse : function() {
-			this.get('game').get('activePlayer').useLighthouse();
+		useLighthouse : function(player) {
+			player.useLighthouse();
 		},
-		lighthouseTake : function(card) {
-			this.get('game').get('activePlayer').lighthouseTake(card);
+		lighthouseTake : function(player, card) {
+			player.lighthouseTake(card);
 		},
-		thanksYourExcellency : function() {
-			this.get('game').get('currentCharacter').thanksYourExcellency();
+		thanksYourExcellency : function(character) {
+			character.thanksYourExcellency();
 		},
-		yesGraveyard : function() {
-			var game = this.get('game');
-			var player_to = game.get('activePlayer') === game.get('player2') ? game.get('player1') : game.get('player2');
+		yesGraveyard : function(game, player_to) {
 			player_to.useGraveyard(game, true);
 		},
-		noGraveyard : function() {
-			var game = this.get('game');
-			var player_to = game.get('activePlayer') === game.get('player2') ? game.get('player1') : game.get('player2');
+		noGraveyard : function(game, player_to) {
 			player_to.useGraveyard(game, false);
 		}	
   }
