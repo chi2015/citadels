@@ -1,7 +1,7 @@
 App.Game = Ember.Object.extend({
 	
 	name: "new game",
-	version: "1.1.0",
+	version: "1.1.1",
 	player1 : null,
 	player2: null,
 	player1_strategy: null,

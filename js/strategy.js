@@ -178,7 +178,7 @@ App.Strategy = Ember.Object.extend({
 		if (this.get('player').get('has_crown') && this.get('player').get('characters').findBy('name', 'Bishop')) return false;
 		if (this.get('player').get('closed')) return false;
 		if (this.get('enemy').get('coins') + this.get('enemy').get('districts').filterBy('color','red').length + this.get('enemy').hasDistrict('school') <
-		this.get('player').get('score') - this.get('enemy').get('score')) return false;
+		this.get('player').get('score') - this.get('enemy').get('score') + this.get('player').get('coins') - 2) return false;
 		if (this.get('player').get('districts').length >= this.get('enemy').get('districts').length + 2) return false;
 		return true;
 	},
@@ -191,6 +191,11 @@ App.Strategy = Ember.Object.extend({
 			useful_character = characters.findBy('name', 'Thief');
 		else if (this.magicianIsUseful() && characters.findBy('name', 'Magician'))
 			useful_character = characters.findBy('name', 'Magician');
+	    else if (this.get('enemy').get('cards').length < 3 && 
+		    this.get('player').get('cards').length > 1 &&
+		    this.get('player').get('cards').length > this.get('enemy').get('cards').length
+		    && characters.findBy('name', 'Magician') && !this.get('player').get('characters').findBy('number',1))
+		    useful_character = characters.findBy('name', 'Magician');
 		else if (this.get('player').get('coins') > 3 && characters.findBy('name', 'Architect'))
 			useful_character = characters.findBy('name', 'Architect');
 		else if (this.get('player').get('coins') > 2 && this.get('player').get('cards').length && !this.hasAllDublicates() && characters.findBy('name', 'Alchemist')
@@ -635,8 +640,8 @@ App.Strategy = Ember.Object.extend({
 			this.get('game').get('currentCharacter').useLab(this.get('player').get('cards').objectAt(0));
 		
 		if (this.get('player').get('cards').length == 0 || 
-		    (this.get('enemy').get('cards').length > this.get('player').get('cards').length + 1 - this.hasAllDublicates() &&
-		    !check_built))
+		    (this.get('enemy').get('cards').length > this.get('player').get('cards').length + 1 - this.get('player').get('cards').length * this.hasAllDublicates() &&
+		    (!check_built || this.hasAllDublicates())))
 		{
 			if (this.get('player').get('hasLab') && this.get('player').get('cards').length == 1)
 				this.get('game').get('currentCharacter').useLab(this.get('player').get('cards').objectAt(0));
