@@ -16,7 +16,6 @@ App.Game = Ember.Object.extend({
 	winner : "",
 	is_extended : false,
 	extended : [],
-	is_loading : true,
 	setWinner : function() {
 		var winner;
 		if (this.get('player1').get('score') > this.get('player2').get('score'))
@@ -122,10 +121,6 @@ App.Game = Ember.Object.extend({
 		var that = this;
 		$( window ).bind("unload", function() {
 			that.save();
-		});
-		
-		$( window ).load(function() {
-			that.set('is_loading', false);
 		});
 	},
 	save : function() {

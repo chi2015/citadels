@@ -14,6 +14,12 @@ p {
 	margin: 5px 0;
 }
 
+.loading-block {
+	width: 100%;
+	text-align: center;
+	font-size: 18px;
+}
+
 .main-block {
 	display: -webkit-box;
 	display: -ms-flexbox;

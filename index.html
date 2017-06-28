@@ -7,11 +7,9 @@
   <link rel="icon" type="image/png" href="favicon.png">
 </head>
 <body>  
+  <div class="loading-block">Loading...</div>
   <script type="text/x-handlebars" data-template-name="index">
 	<div class="main-block">
-		{{#if model.is_loading}}
-		Loading...
-		{{else}}
 		{{#if model.phazeIsStart}}
 			<form {{action 'start' gameName yourName robotName on="submit"}}>
 			<div class="start-block">
@@ -975,7 +973,6 @@
 			{{/each}}
 		</div>
 		{{/unless}}
-	{{/if}}
 	</div>
   </script>
 
@@ -989,5 +986,6 @@
   <script src="js/strategy.js"></script>
   <script src="js/game.js"></script>
   <script src="js/index.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>
