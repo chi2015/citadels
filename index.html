@@ -137,7 +137,7 @@
 						{{#each model.characters.content as |character|}}
 							{{#if character.inRound}}
 									<div class="tooltip">
-										<div {{action "takeCharacter" model model.activePlayer character}} class="sprite {{character.class}} card-item"></div>
+										<div {{action "takeCharacter" model model.activePlayer character}} class="sprite {{character.pic_class}} card-item"></div>
 										<span class="tooltiptext">{{character.desc}}</span>
 									</div>
 							{{/if}}
@@ -151,7 +151,7 @@
 					<div class="cards-list">
 						{{#each model.characters.content as |character|}}
 							{{#if character.inRound}}
-							        <div {{action "discardCharacter" model model.activePlayer character}} class="sprite {{character.class}} card-item"></div>
+							        <div {{action "discardCharacter" model model.activePlayer character}} class="sprite {{character.pic_class}} card-item"></div>
 							{{/if}}
 						{{/each}}
 					</div>
@@ -165,7 +165,7 @@
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
 						{{#unless character.isAssassin}}
-							<div {{action "assassinateCharacter" model.currentCharacter character}} class="sprite {{character.class}} card-item"></div>
+							<div {{action "assassinateCharacter" model.currentCharacter character}} class="sprite {{character.pic_class}} card-item"></div>
 						{{/unless}}
 					{{/each}}
 					</div>
@@ -177,7 +177,7 @@
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
 						{{#unless character.isWitch}}
-							<div {{action "bewitchCharacter" model.currentCharacter character}} class="sprite {{character.class}} card-item"></div>
+							<div {{action "bewitchCharacter" model.currentCharacter character}} class="sprite {{character.pic_class}} card-item"></div>
 						{{/unless}}
 					{{/each}}
 					</div>
@@ -193,7 +193,7 @@
 						{{#unless character.isThief}}
 						{{#unless character.isAssassinated}}
 						{{#unless character.isBewitched}}
-						    <div {{action "robCharacter" model.currentCharacter character}} class="sprite {{character.class}} card-item"></div>
+						    <div {{action "robCharacter" model.currentCharacter character}} class="sprite {{character.pic_class}} card-item"></div>
 						{{/unless}}
 						{{/unless}}
 						{{/unless}}
@@ -461,10 +461,10 @@
 											{{/if}}
 										</div>
 										{{#if character.is_current}}
-											<div class="sprite {{character.class}} card-item current"></div>
+											<div class="sprite {{character.pic_class}} card-item current"></div>
 										{{/if}}
 										{{#unless character.is_current}}
-											<div class="sprite {{character.class}} card-item"></div>
+											<div class="sprite {{character.pic_class}} card-item"></div>
 										{{/unless}}
 										<span class="tooltiptext">{{character.desc}}</span>
 									{{else}}
@@ -484,10 +484,10 @@
 										{{/if}}
 									</div>
 									{{#if character.is_current}}
-										<div class="sprite {{character.class}} card-item current"></div>
+										<div class="sprite {{character.pic_class}} card-item current"></div>
 									{{/if}}
 									{{#unless character.is_current}}
-										<div class="sprite {{character.class}} card-item"></div>
+										<div class="sprite {{character.pic_class}} card-item"></div>
 									{{/unless}}
 									<span class="tooltiptext">{{character.desc}}</span>
 								{{/if}}
@@ -571,10 +571,10 @@
 											{{/if}}
 										</div>
 										{{#if character.is_current}}
-											<div class="sprite {{character.class}} card-item current"></div>
+											<div class="sprite {{character.pic_class}} card-item current"></div>
 										{{/if}}
 										{{#unless character.is_current}}
-											<div class="sprite {{character.class}} card-item"></div>
+											<div class="sprite {{character.pic_class}} card-item"></div>
 										{{/unless}}
 										<span class="tooltiptext">{{character.desc}}</span>
 									{{else}}
@@ -594,10 +594,10 @@
 										{{/if}}
 									</div>
 									{{#if character.is_current}}
-										<div class="sprite {{character.class}} card-item current"></div>
+										<div class="sprite {{character.pic_class}} card-item current"></div>
 									{{/if}}
 									{{#unless character.is_current}}
-										<div class="sprite {{character.class}} card-item"></div>
+										<div class="sprite {{character.pic_class}} card-item"></div>
 									{{/unless}}
 									<span class="tooltiptext">{{character.desc}}</span>
 								{{/if}}	
@@ -742,7 +742,7 @@
 						{{#each model.characters.content as |character|}}
 							{{#if character.inRound}}
 									<div class="tooltip">
-										<div {{action "takeCharacter" model model.activePlayer character}} class="sprite {{character.class}} card-item"></div>
+										<div {{action "takeCharacter" model model.activePlayer character}} class="sprite {{character.pic_class}} card-item"></div>
 										<span class="tooltiptext">{{character.desc}}</span>
 									</div>
 							{{/if}}
@@ -756,7 +756,7 @@
 					<div class="cards-list">
 						{{#each model.characters.content as |character|}}
 							{{#if character.inRound}}
-									<div {{action "discardCharacter" model model.activePlayer character}} class="sprite {{character.class}} card-item"></div>
+									<div {{action "discardCharacter" model model.activePlayer character}} class="sprite {{character.pic_class}} card-item"></div>
 							{{/if}}
 						{{/each}}
 					</div>
@@ -770,7 +770,7 @@
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
 						{{#unless character.isAssassin}}
-							<div {{action "assassinateCharacter" model.currentCharacter character}} class="sprite {{character.class}} card-item"></div>
+							<div {{action "assassinateCharacter" model.currentCharacter character}} class="sprite {{character.pic_class}} card-item"></div>
 						{{/unless}}
 					{{/each}}
 					</div>
@@ -782,7 +782,7 @@
 					<div class="cards-list">
 					{{#each model.characters.content as |character|}}
 						{{#unless character.isWitch}}
-							<div {{action "bewitchCharacter" model.currentCharacter character}} class="sprite {{character.class}} card-item"></div>
+							<div {{action "bewitchCharacter" model.currentCharacter character}} class="sprite {{character.pic_class}} card-item"></div>
 						{{/unless}}
 					{{/each}}
 					</div>
@@ -798,7 +798,7 @@
 						{{#unless character.isThief}}
 						{{#unless character.isAssassinated}}
 						{{#unless character.isBewitched}}
-							<div {{action "robCharacter" model.currentCharacter character}} class="sprite {{character.class}} card-item"></div>
+							<div {{action "robCharacter" model.currentCharacter character}} class="sprite {{character.pic_class}} card-item"></div>
 						{{/unless}}
 						{{/unless}}
 						{{/unless}}

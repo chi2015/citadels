@@ -14,7 +14,7 @@ App.Character = Ember.Object.extend({
 	thanked : false,
 	is_current : false,
 	status : 'in_round', //in_round, in_hand, discarded
-    pic : "",
+    pic_class : "",
 	state : 'normal', //assassinated, robbed, bewitched
 	revealed: false,
 	reveal : function(game) {
@@ -281,8 +281,7 @@ App.Assassin = App.Character.extend({
 	desc: "Assassin. May select a character to Assassinate. That character loses their turn.",
 	isAssassin : true,
 	number : 1,
-	pic: "character1.jpg",
-	class: "character1",
+	pic_class: "character1",
 	assassinated: false,
 	assassinate : function(character) {
 		if (this.get('assassinated')) return;
@@ -306,8 +305,7 @@ App.Thief = App.Character.extend({
 	name: "Thief",
 	desc: "Thief. May select a character to steal from. At the start of their turn, the Thief takes their gold.",
 	isThief: true,
-	pic: "character2.jpg",
-	class: "character2",
+	pic_class: "character2",
 	number: 2,
 	robbed: false,
 	rob : function(character) {
@@ -333,8 +331,7 @@ App.Magician = App.Character.extend({
 	name: "Magician",
 	desc: "Magician. May either exchange hands with another player, or swap cards in his hand for cards from the deck.",
 	isMagician: true,
-	pic: "character3.jpg",
-	class: "character3",
+	pic_class: "character3",
 	number: 3,
 	did_magic: false,
 	choosed_to_discard : false,
@@ -430,8 +427,7 @@ App.King = App.ColourCharacter.extend({
 	desc: "King. Receives income for Noble (yellow) Districts. Also gets first choice of characters during the next turn.",
 	number: 4,
 	color: "yellow",
-	pic: "character4.jpg",
-	class: "character4",
+	pic_class: "character4",
 	reveal : function(game) {
 		if (this.get('status') == 'in_hand') game.setCrownTo(this.get('player'));	
 		this._super(game);
@@ -443,8 +439,7 @@ App.Bishop = App.ColourCharacter.extend({
 	desc: "Bishop. Receives income from Religious (blue) Districts. His Buildings cannot be Destroyed by the Warlord or swapped by the Diplomat.",
 	number: 5,
 	color: "blue",
-	pic: "character5.jpg",
-	class: "character5"
+	pic_class: "character5"
 });
 
 App.Merchant = App.ColourCharacter.extend({
@@ -452,8 +447,7 @@ App.Merchant = App.ColourCharacter.extend({
 	desc: "Merchant. Receives income from Trade (green) Districts. Also receives one gold at the start of his turn.",
 	number: 6,
 	color: "green",
-	pic: "character6.jpg",
-	class: "character6",
+	pic_class: "character6",
 	takeCoins: function(game)
 	{
 		if (this.get('took')) return;
@@ -472,8 +466,7 @@ App.Architect = App.Character.extend({
 	name: "Architect",
 	desc: "Architect. Receives 2 additional cards when he takes his 2 gold or 1 card. Can build up to 3 Districts per turn.",
 	number: 7,
-	pic: "character7.jpg",
-	class: "character7",
+	pic_class: "character7",
 	max_build : 3,
 	takeCoins: function(game)
 	{
@@ -497,8 +490,7 @@ App.Warlord = App.ColourCharacter.extend({
 	desc: "Warlord. Receives income from Military (red) Districts. At the end of his turn, he may destroy a District for the cost of that District -1 gold.",
 	isWarlord: true,
 	number: 8,
-	pic: "character8.jpg",
-	class: "character8",
+	pic_class: "character8",
 	color: "red",
 	destroyed : false,
 	destroy : function(game, player_to, district) {
@@ -556,8 +548,7 @@ App.Witch = App.Character.extend({
 	desc : "Witch. Can Bewitch a character of her choice, playing part of her turn with the chosen character skills.",
 	isWitch : true,
 	number : 1,
-	pic : "character11.jpg",
-	class: "character11",
+	pic_class: "character11",
 	max_build: 0,
 	bewitched : false,
 	bewitch : function(character) {
@@ -581,16 +572,14 @@ App.TaxCollector = App.Character.extend({
 	name : "Tax",
 	desc : "Tax Collector. Each other player that builds at least one District in her turn, gives one gold to the Tax Collector.",
 	number : 2,
-	pic : "character12.jpg",
-	class: "character12"
+	pic_class: "character12"
 });
 
 App.Wizard = App.Character.extend({
 	name: "Wizard",
 	number : 3,
 	desc: "Wizard. Can choose a card from the hand of another player. Then, he can choose to put in his hand or to build it, regardless of the normal building in this turn.",
-	pic: "character13.jpg",
-	class: "character13",
+	pic_class: "character13",
 	isWizard : true,
 	stole : false,
 	wizard_built : false,
@@ -651,8 +640,7 @@ App.Emperor = App.ColourCharacter.extend({
 	desc: "Emperor. Receives income from Noble (gold) Districts. You must give the Crown to another player, who has to pay you a gold piece or a card (your choice).",
 	number: 4,
 	color: "yellow",
-	pic: "character14.jpg",
-	class: "character14",
+	pic_class: "character14",
 	isEmperor: true,
 	coronated: false,
 	resetParams : function() {
@@ -688,8 +676,7 @@ App.Abbot = App.ColourCharacter.extend({
 	desc: "Abbot. Receives income from Religious (blue) Districts. The most rich player must give him a gold piece.",
 	number: 5,
 	color: "blue",
-	pic: "character15.jpg",
-	class: "character15",
+	pic_class: "character15",
 	reveal : function(game) {
 		if (this.get('state') == 'assassinated' || this.get('status') == 'discarded' || this.get('state') == 'bewitched')
 		{
@@ -719,8 +706,7 @@ App.Alchemist = App.Character.extend({
 	name: "Alchemist",
 	desc: "Alchemist. He receives the total cost of a District after building it.",
 	number: 6,
-	pic: "character16.jpg",
-	class: "character16",
+	pic_class: "character16",
 	build : function(game, card) {
 		if (this.get('built') == this.get('max_build')) return;
 		var coins_to_return = card.get('cost') - (this.get('handle_player').hasDistrict('factory') && card.get('color') == 'purple');
@@ -735,8 +721,7 @@ App.Navigator = App.Character.extend({
 	isNavigator: true,
 	number: 7,
 	max_build: 0,
-	pic: "character17.jpg",
-	class: "character17",
+	pic_class: "character17",
 	navigated: false,
 	take4Cards : function(game) {
 		if (this.get('navigated')) return;
@@ -765,8 +750,7 @@ App.Diplomat = App.ColourCharacter.extend({
 	isDiplomat: true,
 	number: 8,
 	color: "red",
-	pic: "character18.jpg",
-	class: "character18",
+	pic_class: "character18",
 	swapped: false,
 	resetParams : function() {
 		this._super();
