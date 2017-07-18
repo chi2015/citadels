@@ -95,7 +95,7 @@ App.Strategy = Ember.Object.extend({
 			this.get('player').hasDistrict('treasury') || this.get('player').hasDistrict('museum')) && !this.get('player').get('closed') &&
 			characters.findBy('name', 'Diplomat') && (in_round || (!in_round && this.isPossibleEnemyCharacter(8))))
 			danger_characters = this.pushCharacter(danger_characters, characters.findBy('name', 'Diplomat'));
-		if (this.get('enemy').get('cards').length < 3 && 
+		if (Math.random() >= 0.5 && this.get('enemy').get('cards').length < 3 && 
 		    this.get('player').get('cards').length > 1 &&
 		    this.get('player').get('cards').length > this.get('enemy').get('cards').length
 		    && characters.findBy('name', 'Magician') && (in_round || (!in_round && this.isPossibleEnemyCharacter(3))))
@@ -176,11 +176,13 @@ App.Strategy = Ember.Object.extend({
 		return useful;
 	},
 	warlordIsDangerous : function() {
-		if (this.get('enemy').get('score') == 0) return false;
+		if (this.get('enemy').get('score') == 0 && this.get('player').get('score') == 0) return false;
 		if (this.get('player').get('has_crown') && this.get('player').get('characters').findBy('name', 'Bishop')) return false;
 		if (this.get('player').get('closed')) return false;
+		if (this.get('enemy').get('coins') < 2 && this.get('enemy').get('districts').filterBy('color','red').length < 1 &&
+		    this.get('player').get('districts').filterBy('cost', 1).length < 1 && !this.get('player').hasDistrict('greatwall')) return false;
 		if (this.get('enemy').get('coins') + this.get('enemy').get('districts').filterBy('color','red').length + this.get('enemy').hasDistrict('school') <
-		this.get('player').get('score') - this.get('enemy').get('score') + this.get('player').get('coins') - 2) return false;
+		this.get('player').get('score') - this.get('enemy').get('score') + this.get('player').get('coins') + this.get('player').hasDistrict('greatwall') - 1) return false;
 		if (this.get('player').get('districts').length >= this.get('enemy').get('districts').length + 2) return false;
 		return true;
 	},
@@ -440,8 +442,6 @@ App.Strategy = Ember.Object.extend({
 		
 		this.destroyArmoryStrategy();
 		
-		if (this.get('game').get('currentCharacter').get('isWarlord')) this.warlordStrategy()
-		
 		if (this.checkChooseCard()) 
 		{
 			if (this.get('player').get('hasWorkshop')
@@ -575,6 +575,7 @@ App.Strategy = Ember.Object.extend({
 		if (this.get('game').get('currentCharacter').get('isThief')) this.thiefStrategy();
 		if (this.get('game').get('currentCharacter').get('isWizard')) this.wizardStrategy();
 		if (this.get('game').get('currentCharacter').get('isDiplomat')) this.diplomatStrategy();
+		if (this.get('game').get('currentCharacter').get('isWarlord')) this.warlordStrategy();
 		
 		if (this.get('player').get('hasArmory')) this.armoryStrategy();
 		
@@ -628,13 +629,18 @@ App.Strategy = Ember.Object.extend({
 		this.get('game').get('currentCharacter').bewitch(character_to_bewitch);
 	},
 	thiefStrategy : function() {
-		this.get('game').get('currentCharacter').rob(Math.random() < 0.5 ? 
-		this.get('game').get('characters').get('content').filterBy('status', 'discarded').rejectBy('number', 1).rejectBy('player', this.get('player')).objectAt(Math.floor(Math.random() * 3)) :
-		(this.get('enemy').get('characters').findBy('number', 1) || 
-		 this.get('enemy').get('characters').findBy('state', 'assassinated') || 
-		 this.get('enemy').get('characters').findBy('state', 'bewitched')) ?
-			this.get('enemy').get('characters').rejectBy('number', 1).rejectBy('state', 'assassinated').rejectBy('state','bewitched').objectAt(0) :
-			this.get('enemy').get('characters').objectAt(Math.floor(Math.random() * 2)));	
+		var possible_characters = this.get('enemy').get('possible_characters');
+
+		var reject_character = this.get('enemy').get('characters').findBy('number', 1) || 
+		 this.get('game').get('characters').get('content').findBy('state', 'assassinated') || 
+		 this.get('game').get('characters').get('content').findBy('state', 'bewitched');
+		
+		if (reject_character) {
+			possible_characters.splice(possible_characters.indexOf(reject_character.get('number')), 1);
+		}
+		
+		var random_character_number = possible_characters.objectAt(Math.floor(Math.random() * possible_characters.length));
+		this.get('game').get('currentCharacter').rob(this.get('game').get('characters').get('content').findBy('number', random_character_number));	
 	},
 	magicianStrategy : function(check_built) {
 		var that = this;
