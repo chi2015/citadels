@@ -113,7 +113,7 @@ App.Game = Ember.Object.extend({
 		//delete all game objects
 	},
 	showError : function(text) {
-		if (!this.get('activePlayer') || !this.get('activePlayer').get('is_robot')) alert(text);
+		if (!this.get('activePlayer') || !this.get('activePlayer').get('is_robot')) swal("Error", text, 'error');
 	},
 	init() {
 		//console.log(JSON.stringify(localStorage.getItem('game')));
