@@ -98,12 +98,26 @@ App.Game = Ember.Object.extend({
 			this.set('phaze','choose');
 	},
 	finish : function(text) {
-		if (confirm("Are you sure you want to finish this game?"))
-		{
-			this.setWinner();
-			this.set('currentCharacter', null);
-			this.set('phaze','end');
-		}
+		var that = this;
+		swal({
+  title: 'Finishing game',
+  text: "Are you sure you want to finish this game?",
+  type: 'warning',
+  showCancelButton: true,
+  confirmButtonColor: '#3085d6',
+  cancelButtonColor: '#d33',
+  confirmButtonText: 'Yes',
+  cancelButtonText: 'No',
+  confirmButtonClass: 'btn btn-success',
+  cancelButtonClass: 'btn btn-danger',
+  buttonsStyling: false
+}).then(function () {
+  that.setWinner();
+			that.set('currentCharacter', null);
+			that.set('phaze','end');
+}, function (dismiss) {
+
+});
 	},
 	restart : function() {
 		this.set('first_full_city', false);
