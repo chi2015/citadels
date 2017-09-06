@@ -510,14 +510,14 @@
 				<div class="cards-list districts-list">
 					{{#each model.player1.districts as |district|}}
 						<div class="tooltip">
-						{{#if model.currentCharacter.isWarlord}}
+						{{#if model.currentCharacter.isWarlordAndHuman}}
 							<div {{action "destroy" model model.currentCharacter model.player1 district}} class="sprite {{district.name}} card-item"></div>
 						{{/if}}
-						{{#if model.currentCharacter.isDiplomat}}
+						{{#if model.currentCharacter.isDiplomatAndHuman}}
 							<div {{action "swap" model model.currentCharacter district}} class="sprite {{district.name}} card-item"></div>
 						{{/if}}
-						{{#unless model.currentCharacter.isWarlord}}
-							{{#unless model.currentCharacter.isDiplomat}}
+						{{#unless model.currentCharacter.isWarlordAndHuman}}
+							{{#unless model.currentCharacter.isDiplomatAndHuman}}
 								<div class="sprite {{district.name}} card-item"></div>
 							{{/unless}}
 						{{/unless}}
@@ -620,14 +620,14 @@
 				<div class="cards-list districts-list">
 					{{#each model.player2.districts as |district|}}
 						<div class="tooltip">
-						{{#if model.currentCharacter.isWarlord}}
+						{{#if model.currentCharacter.isWarlordAndHuman}}
 							<div {{action "destroy" model model.currentCharacter model.player2 district}} class="sprite {{district.name}} card-item"></div>
 						{{/if}}
-						{{#if model.currentCharacter.isDiplomat}}
+						{{#if model.currentCharacter.isDiplomatAndHuman}}
 							<div {{action "swap" model model.currentCharacter district}} class="sprite {{district.name}} card-item"></div>
 						{{/if}}
-						{{#unless model.currentCharacter.isWarlord}}
-							{{#unless model.currentCharacter.isDiplomat}}
+						{{#unless model.currentCharacter.isWarlordAndHuman}}
+							{{#unless model.currentCharacter.isDiplomatAndHuman}}
 								<div  class="sprite {{district.name}} card-item"></div>
 							{{/unless}}
 						{{/unless}}

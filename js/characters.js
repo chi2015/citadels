@@ -257,6 +257,12 @@ App.Character = Ember.Object.extend({
 	isBewitched : function() {
 		return this.get('state') == 'bewitched';
 	}.property('state'),
+	isWarlordAndHuman : Ember.computed('name', 'player', 'player.is_robot', function() {
+		return this.get('name') == 'Warlord' && this.get('player') && !this.get('player').get('is_robot');
+	}),
+	isDiplomatAndHuman : Ember.computed('name', 'player', 'player.is_robot', function() {
+		return this.get('name') == 'Diplomat' && this.get('player') && !this.get('player').get('is_robot');
+	}),
 	serialize : function() {
 		return {
 			"player" : this.get('player') ? this.get('player').get('name') : false,
