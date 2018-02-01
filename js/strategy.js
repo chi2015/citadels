@@ -100,7 +100,7 @@ App.Strategy = Ember.Object.extend({
 		    this.get('player').get('cards').length > this.get('enemy').get('cards').length
 		    && characters.findBy('name', 'Magician') && (in_round || (!in_round && this.isPossibleEnemyCharacter(3))))
 			danger_characters = this.pushCharacter(danger_characters, characters.findBy('name', 'Magician'));
-		if (this.get('enemy').get('coins') > 3 && characters.findBy('name', 'Alchemist') && (in_round || (!in_round && this.isPossibleEnemyCharacter(6))))
+		if (!this.endOfGame() && this.get('enemy').get('coins') > 3 && characters.findBy('name', 'Alchemist') && (in_round || (!in_round && this.isPossibleEnemyCharacter(6))))
 			danger_characters = this.pushCharacter(danger_characters, characters.findBy('name', 'Alchemist'));
 		if (this.get('enemy').get('coins') > 3 && characters.findBy('name', 'Architect') && (in_round || (!in_round && this.isPossibleEnemyCharacter(7))))
 			danger_characters = this.pushCharacter(danger_characters, characters.findBy('name', 'Architect'));
@@ -193,7 +193,7 @@ App.Strategy = Ember.Object.extend({
 			useful_character = characters.findBy('number', 1);
         else if ((this.get('enemy').get('coins') > 2 || (this.get('player').get('coins') > 3 && !this.get('player').get('characters').findBy('number',1))) && characters.findBy('name', 'Thief'))
 			useful_character = characters.findBy('name', 'Thief');
-	    else if (this.get('enemy').get('cards').length < 3 && 
+	    else if (Math.random() > 0.6 && this.get('enemy').get('cards').length < 3 && 
 		    this.get('player').get('cards').length > 1 &&
 		    this.get('player').get('cards').length > this.get('enemy').get('cards').length
 		    && characters.findBy('name', 'Magician') && !this.get('player').get('characters').findBy('number',1))
@@ -205,11 +205,12 @@ App.Strategy = Ember.Object.extend({
 			useful_character = characters.findBy('name', 'Alchemist');
 		else if (this.get('player').get('coins') > 3 && characters.findBy('name', 'Wizard') && this.get('enemy').get('cards').length > 1 && this.get('player').get('cards').length > 1)
 			useful_character = characters.findBy('name', 'Wizard');
-		else if ((this.get('player').get('districts').filterBy('color', 'green').length > 1 || this.get('player').get('cards').filterBy('color', 'green').length > 1 ) && characters.findBy('name', 'Merchant'))
+		else if ((this.get('player').get('districts').filterBy('color', 'green').length > 0 || this.get('player').get('cards').filterBy('color', 'green').length > 0 )
+		 && characters.findBy('name', 'Merchant'))
 			useful_character = characters.findBy('name', 'Merchant');
 		else if ((this.get('player').get('districts').filterBy('color', 'red').length > 1 || this.get('player').get('cards').filterBy('color', 'red').length > 1 ) && characters.findBy('number', 8))
 			useful_character = characters.findBy('number', 8);
-		else if (characters.findBy('name', 'Magician') && this.magicianIsUseful())
+		else if (Math.random() > 0.6 && characters.findBy('name', 'Magician') && this.magicianIsUseful())
 			useful_character = characters.findBy('name', 'Magician');
 		else if ((this.get('player').get('districts').filterBy('color', 'blue').length > 1 || this.get('player').get('cards').filterBy('color', 'blue').length > 1 ) && characters.findBy('number', 5))
 			useful_character = characters.findBy('number', 5);
@@ -537,7 +538,7 @@ App.Strategy = Ember.Object.extend({
 			for (var i=1; i<=user_cards.length; i++)
 			{
 				card_to_build = user_cards.objectAt(
-				['Architect', 'Wizard', 'Warlord'].indexOf(this.get('game').get('currentCharacter').get('name')) > -1
+				['Architect', 'Wizard', 'Warlord', 'Diplomat'].indexOf(this.get('game').get('currentCharacter').get('name')) > -1
 				&& this.get('player').get('coins') < user_cards.get('lastObject').get('cost') * 2 ? 
 				i - 1 : user_cards.length - i);
 				this.get('game').get('currentCharacter').build(this.get('game'), card_to_build);
@@ -559,7 +560,7 @@ App.Strategy = Ember.Object.extend({
 			this.get('game').get('currentCharacter').get('name') == 'Architect' || this.get('game').get('currentCharacter').get('name') == 'Wizard' ? 
 			this.get('player').get('cards').length - 1 : 0));
 		
-		if (this.get('player').get('hasMuseum') && (this.hasAllDublicates() || this.get('player').get('cards').length > 1))
+		if (this.get('player').get('hasMuseum') && (this.hasAllDublicates() || this.get('player').get('cards').length > 1) || this.endOfGame())
 			this.get('game').get('currentCharacter').underMuseum(this.get('game'), this.get('player').get('cards').sortBy('cost').objectAt(
 			this.get('game').get('currentCharacter').get('name') == 'Architect' || this.get('game').get('currentCharacter').get('name') == 'Wizard' ? 
 			this.get('player').get('cards').length - 1 : 0));
