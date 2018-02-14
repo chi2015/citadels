@@ -224,7 +224,7 @@ App.Strategy = Ember.Object.extend({
 			useful_character = characters.findBy('name', 'Architect');
 		else if ((!this.get('player').get('cards').length || this.hasAllDublicates()) && characters.findBy('name', 'Wizard') && this.get('enemy').get('cards').length > 1)
 			useful_character = characters.findBy('name', 'Wizard');	
-		else if (!this.endOfGame() && characters.findBy('name', 'Warlord'))  
+		else if (this.get('enemy').get('districts').length && !this.endOfGame() && characters.findBy('name', 'Warlord'))  
 			useful_character = characters.findBy('name', 'Warlord');
 		else if ((this.get('enemy').get('districts').filterBy('cost', 5).length || 
 		          this.get('enemy').get('districts').filterBy('cost', 6).length ||
