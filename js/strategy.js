@@ -210,7 +210,7 @@ App.Strategy = Ember.Object.extend({
 			useful_character = characters.findBy('name', 'Merchant');
 		else if ((this.get('player').get('districts').filterBy('color', 'red').length > 1 || this.get('player').get('cards').filterBy('color', 'red').length > 1 ) && characters.findBy('number', 8))
 			useful_character = characters.findBy('number', 8);
-		else if (Math.random() > 0.6 && characters.findBy('name', 'Magician') && this.magicianIsUseful())
+		else if (characters.findBy('name', 'Magician') && this.magicianIsUseful())
 			useful_character = characters.findBy('name', 'Magician');
 		else if ((this.get('player').get('districts').filterBy('color', 'blue').length > 1 || this.get('player').get('cards').filterBy('color', 'blue').length > 1 ) && characters.findBy('number', 5))
 			useful_character = characters.findBy('number', 5);
@@ -224,13 +224,8 @@ App.Strategy = Ember.Object.extend({
 			useful_character = characters.findBy('name', 'Architect');
 		else if ((!this.get('player').get('cards').length || this.hasAllDublicates()) && characters.findBy('name', 'Wizard') && this.get('enemy').get('cards').length > 1)
 			useful_character = characters.findBy('name', 'Wizard');	
-		else if (this.get('enemy').get('districts').length && !this.endOfGame() && characters.findBy('name', 'Warlord'))  
-			useful_character = characters.findBy('name', 'Warlord');
-		else if ((this.get('enemy').get('districts').filterBy('cost', 5).length || 
-		          this.get('enemy').get('districts').filterBy('cost', 6).length ||
-		          this.get('enemy').hasDistrict('armory') || this.get('enemy').hasDistrict('treasury') || this.get('enemy').hasDistrict('museum'))
-		         && !this.endOfGame() && characters.findBy('name', 'Diplomat'))
-			useful_character = characters.findBy('name', 'Diplomat');
+		else if (this.enemyHasUsefulDistricts(!!characters.findBy('name', 'Diplomat')) && !this.endOfGame() && characters.findBy('number', 8))  
+			useful_character = characters.findBy('number', 8);
 		else if (((this.get('player').get('possible_characters').contains(4) && this.get('player').get('coins') < 4) || this.get('player').hasDistrict('treasury') || this.get('player').hasDistrict('maproom'))
 		&& characters.findBy('name', 'Navigator'))
 			useful_character = characters.findBy('name', 'Navigator');
@@ -599,6 +594,14 @@ App.Strategy = Ember.Object.extend({
 				has = false;
 		});
 		return has;
+	},
+	enemyHasUsefulDistricts : function(is_diplomat) {
+		if (!this.get('enemy').get('districts').length) return false;
+		if (this.get('enemy').hasDistrict('armory') || this.get('enemy').hasDistrict('treasury') || this.get('enemy').hasDistrict('museum')) return true;
+		if (is_diplomat) return this.get('enemy').get('districts').filterBy('cost', 5).length || this.get('enemy').get('districts').filterBy('cost', 6).length;
+		else return this.get('enemy').get('districts').filterBy('cost', 1).length || this.get('enemy').get('districts').filterBy('cost', 2).length || 
+		this.get('enemy').get('districts').filterBy('cost', 3).length;
+		
 	},
 	assassinStrategy : function() {
 		var possible_characters = this.get('enemy').get('possible_characters');
