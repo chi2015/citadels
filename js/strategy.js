@@ -864,6 +864,28 @@ App.Strategy = Ember.Object.extend({
 		}
 		
 	    if (this.get('game').get('currentCharacter').get('isColor')) this.get('game').get('currentCharacter').takeIncome();	  
+	},
+	/* refactoring strategy functions */
+	action: function() {
+		this.characterAction();
+		this.incomeAction();
+		this.coinsOrCard();
+		this.characterAction();
+		this.build();
+		this.incomeAction();
+		this.characterAction();
+	},
+	characterAction: function() {
+	
+	},
+	incomeAction: function() {
+	
+	},
+	coinsOrCard: function() {
+	
+	},
+	build: function() {
+	
 	}
 });
 
